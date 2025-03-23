@@ -1,0 +1,29 @@
+{
+  "name": "proyecto_disenio",
+  "version": "1.0.0",
+  "description": "Repositorio para la api del proyecto de Diseño digital, grupo de Fernando Josue Rivera Sosa, Carlos Andres Rivera Zelaya y Angel Andres Carias Castillo",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acarias11/Proyecto_Disenio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acarias11/Proyecto_Disenio/issues"
+  },
+  "homepage": "https://github.com/acarias11/Proyecto_Disenio#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.0",
+    "zod": "3.24.2"
+  }
+}
