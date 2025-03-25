@@ -1,0 +1,4 @@
+##probar la conexion de los datos de factura
+// Method: GET
+
+GET http://localhost:3000/factura
