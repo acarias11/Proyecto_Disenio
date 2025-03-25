@@ -34,16 +34,55 @@ app.get('/', (req, res) => {
     res.send('Bienvenido a mi API');
 });
 
-// Mostrar la tabla factura
-app.get('/factura', (req, res) => {
+// Mostrar la tabla usuarios
+app.get('/users', (req, res) => {
     const request = new sql.Request();
-    request.query('SELECT * FROM FACTURA', (err, result) => {
+    request.query('SELECT * FROM USUARIOS', (err, result) => {
         if (err) {
-            console.error('Error al obtener datos de la factura:', err);
-            res.status(500).send('Error al obtener datos de la factura');
+            console.error('Error al obtener datos de LOS usuarios:', err);
+            res.status(500).send('Error al obtener datos de los usuarios');
             return;
         }
-        res.send(result.recordset);
+        // Convertir IDs binarias a números enteros
+        const users = result.recordset.map(user => ({
+            ...user,
+            UsuarioID: user.UsuarioID ? parseInt(Buffer.from(user.UsuarioID).toString('hex'), 16) : null
+        }));
+        res.send(users);
+    });
+});
+
+// Mostrar la tabla libros con nombres de autor y editorial
+app.get('/libros', (req, res) => {
+    const request = new sql.Request();
+    const query = `
+        SELECT 
+            LIBRO.*, 
+            AUTOR.Nombre AS AutorNombre, 
+            EDITORIAL.Nombre AS EditorialNombre 
+        FROM LIBRO
+        JOIN AUTOR ON LIBRO.AutorID = AUTOR.AutorID
+        JOIN EDITORIAL ON LIBRO.EditorialID = EDITORIAL.EditorialID
+    `;
+    request.query(query, (err, result) => {
+        if (err) {
+            console.error('Error al obtener datos de los libros:', err);
+            res.status(500).send('Error al obtener datos de los libros');
+            return;
+        }
+        // Convertir IDs binarias a números enteros y agregar nombres de autor y editorial
+        const libros = result.recordset.map(libro => ({
+            ...libro,
+            LibroID: libro.LibroID ? parseInt(Buffer.from(libro.LibroID).toString('hex'), 16) : null,
+            AutorNombre: libro.AutorNombre,
+            EditorialNombre: libro.EditorialNombre
+        }));
+        // Eliminar AutorID y EditorialID de la respuesta
+        libros.forEach(libro => {
+            delete libro.AutorID;
+            delete libro.EditorialID;
+        });
+        res.send(libros);
     });
 });
 

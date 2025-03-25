@@ -1,4 +1,5 @@
-##probar la conexion de los datos de factura
-// Method: GET
+### GET PARA USUARIOS
+GET http://localhost:3000/users
 
-GET http://localhost:3000/factura
+### GET PARA LIBROS
+GET http://localhost:3000/libros
