@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import booksRoutes from './routes/books.js';
+import authRoutes from './routes/auth.js';
 
 // Cargar variables de entorno desde el archivo .env
 dotenv.config();
@@ -17,6 +18,7 @@ app.use(cors())
 
 // Rutas
 app.use(booksRoutes)
+app.use(authRoutes)
 
 app.get('/', (req, res) => {
     res.send('Bienvenido a mi API');
