@@ -8,11 +8,10 @@ export default class BookController {
         try {
             const result = await BookModel.getAllBooks()
 
-            res.send(result)
-            // successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
+            successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
 
         } catch (err){
-            // errorResponse(res, 500, 'Error al obtener datos de los libros', err)
+            errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
         }
     }
 }

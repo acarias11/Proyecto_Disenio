@@ -28,6 +28,11 @@ export const userSchema = z.object({
     "password": z.string({
         required_error: "La contraseña es obligatoria."
     }).min(5),
+    "email": z.string({
+        required_error: "El email es obligatorio."
+    }).email({
+        invalid_type_error: "El email no es válido."
+    }),
     "rol": z.enum(['Admin','User'])
 })
 

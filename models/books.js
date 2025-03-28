@@ -1,9 +1,8 @@
 import db from '../config/database.js'
 import { successResponse } from '../utils/response.js';
 
-export async function getAllBooks(req, res) {
-    try {
-
+export async function getAllBooks(param) {
+    
         const pool = await db.connect();
 
         // Query para obtener los libros con nombres de autor y editorial
@@ -24,8 +23,19 @@ export async function getAllBooks(req, res) {
         const libros = result.recordset
 
         return libros
-    } catch (err) {
-        // console.error(err)
-        res.status(500).send('Error al obtener datos de los libros')
-    }
+}
+
+export async function verifyUser(email){
+
+    const pool = await db.connect()
+    
+    const query = `
+        SELECT Nombre, CONVERT(VARCHAR(MAX),Password) AS Password, Rol FROM Usuarios WHERE Email LIKE '${email}'
+    `
+
+    const result = await pool.request().query(query)
+
+    const userData = result.recordset[0]
+    
+    return userData
 }

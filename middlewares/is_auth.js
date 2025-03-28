@@ -1,27 +1,24 @@
 import jwt from 'jsonwebtoken'
+import { errorResponse } from '../utils/response.js';
 
 export const isAuth = (req, res, next) => {
 
     const authHeader = req.headers.authorization
     
     if (!authHeader) {
-        res.status(401).json({
-            success: false,
-            message: 'Debe de iniciar sesión'
-        })
+        errorResponse(res, 401, 'No se ha proporcionado el token de autorización')
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
-        const { role } = jwt.verify(token, process.env.SECRET_KEY)
+        const { rol } = jwt.verify(token, process.env.SECRET_KEY)
 
-        req.params.role = role
+        req.params.rol = rol
+
         next();
+
     } catch (error) {
-        return res.status(403).json({
-            success: false,
-            message: error.message
-        })
+        errorResponse(res, 401, message = 'Token no válido', error.message)
     }
 }
