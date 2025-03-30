@@ -36,10 +36,9 @@ export const userSchema = z.object({
     "rol": z.enum(['Admin','User'])
 })
 
-//Si se desea validar libros de forma estricta y/o parcial
-// export const validateBook = (data) => bookSchema.safeParse(data);
-// export const validateBookPartial = (data) => bookSchema.partial().safeParse(data);
+// Validar libros de forma completa o parcial
+export const validateBook = (data) => bookSchema.safeParse(data);
+export const validateBookPartial = (data) => bookSchema.partial().safeParse(data);
 
-// Si se desea validar usuario de forma estricta y/o parcial
-// export const validateUser = (data) => userSchema.safeParse(data);
-// export const validateUserPartial = (data) => userSchema.partial().safeParse(data);
+// Validar usuario de forma completa 
+export const validateUser = (data) => userSchema.safeParse(data);
