@@ -14,6 +14,9 @@ booksRoutes.get('/libros/:id', isAuth, BookController.getById)
 // Crear un libro
 booksRoutes.post('/libros', [isAuth, isAdmin], BookController.create)
 
+// Actualizar el estado de un libro por id
+booksRoutes.patch('/libros/estado/:id', [isAuth, isAdmin], BookController.updateState)
+
 // Actualizar un libro por id
 booksRoutes.patch('/libros/:id', [isAuth, isAdmin], BookController.update)
 
