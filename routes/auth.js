@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router } from "express";
 import AuthController from "../controllers/auth.js";
 import { isAdmin } from "../middlewares/is_admin.js";
 import { isAuth } from "../middlewares/is_auth.js";

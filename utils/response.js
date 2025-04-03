@@ -1,16 +1,11 @@
-export const successResponse = (res, status, data, message, token) => {
-    res.status(status).json({
-        success: status >= 200 && status < 300,
-        data: data,
-        message: message,
-        token: token
-    })
-}
+export const errorResponse = (res, statusCode, message) => {
+    res.status(statusCode).json({ success: false, message });
+};
 
-export const errorResponse = (res, status, message, error) => {
-    res.status(status).json({
-        success: !(status >= 400 && status < 600),
-        message: message,
-        error: error
-    })
-}
+export const successResponse = (res, statusCode, data, message, token = null) => {
+    const response = { success: true, message, data };
+    if (token) {
+        response.token = token;
+    }
+    res.status(statusCode).json(response);
+};

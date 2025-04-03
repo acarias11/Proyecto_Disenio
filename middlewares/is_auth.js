@@ -1,24 +1,38 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import { errorResponse } from '../utils/response.js';
 
 export const isAuth = (req, res, next) => {
-
-    const authHeader = req.headers.authorization
-    
-    if (!authHeader) {
-        errorResponse(res, 401, 'No se ha proporcionado el token de autorización')
-    }
-
-    const token = authHeader.split(' ')[1];
-
     try {
-        const { rol } = jwt.verify(token, process.env.SECRET_KEY)
-
-        req.params.rol = rol
-
+        // Obtener el encabezado de autorización
+        const authHeader = req.headers.authorization;
+        
+        // Verificar si existe el encabezado de autorización
+        if (!authHeader) {
+            return errorResponse(res, 401, 'No autorizado: Token no proporcionado');
+        }
+        
+        // Extraer el token del encabezado (Bearer [token])
+        const token = authHeader.split(' ')[1];
+        
+        if (!token) {
+            return errorResponse(res, 401, 'No autorizado: Formato de token inválido');
+        }
+        
+        // Verificar y decodificar el token
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY || 'secretkey');
+        
+        // Agregar la información del usuario al objeto request para uso en otros middlewares
+        req.user = decodedToken;
+        
+        // Continuar con la solicitud
         next();
-
     } catch (error) {
-        errorResponse(res, 401, message = 'Token no válido', error.message)
+        console.error('Error en autenticación:', error.message);
+        
+        if (error.name === 'TokenExpiredError') {
+            return errorResponse(res, 401, 'No autorizado: Token expirado');
+        }
+        
+        return errorResponse(res, 401, 'No autorizado: Token inválido');
     }
-}
+};

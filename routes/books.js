@@ -1,30 +1,26 @@
-import { Router } from "express";
-import BookController from "../controllers/books.js";
-import { isAuth } from "../middlewares/is_auth.js";
-import { isAdmin } from "../middlewares/is_admin.js";
+import express from 'express';
+import BookController from '../controllers/books.js';
+import { isAuth } from '../middlewares/is_auth.js';
+import { isAdmin } from '../middlewares/is_admin.js';
 
-const booksRoutes = Router();
+const router = express.Router();
 
-// Mostrar la tabla libros en la base de datos
-booksRoutes.get('/libros', isAuth, BookController.getAll) 
+// Rutas públicas
+router.get('/', isAuth, BookController.getAll);
+router.get('/:id', isAuth, BookController.getById);
 
-// Mostrar un libro por id 
-booksRoutes.get('/libros/:id', isAuth, BookController.getById)
+// Rutas protegidas para administradores
+router.post('/', isAuth, isAdmin, BookController.create);
+router.put('/:id', isAuth, isAdmin, BookController.update);
+router.delete('/:id', isAuth, isAdmin, BookController.delete);
 
-// Crear un libro
-booksRoutes.post('/libros', [isAuth, isAdmin], BookController.create)
+// Actualizar estado de un libro (corregir la ruta)
+router.patch('/estado/:id', isAuth, isAdmin, BookController.updateState);
 
-// Actualizar el estado de un libro por id
-booksRoutes.patch('/libros/estado/:id', [isAuth, isAdmin], BookController.updateState)
+// Nueva ruta para ver solicitudes (solo administradores)
+router.get('/solicitudes/all', isAuth, isAdmin, BookController.getAllSolicitudes);
 
-// Actualizar un libro por id
-booksRoutes.patch('/libros/:id', [isAuth, isAdmin], BookController.update)
+// Solicitar un libro (cualquier usuario autenticado)
+router.post('/:id/solicitar', isAuth, BookController.requestBook);
 
-//Eliminar un libro por id
-booksRoutes.delete('/libros/:id', [isAuth, isAdmin], BookController.delete)
-
-// Solicitar un libro por id
-booksRoutes.post('/libros/:id/solicitar', isAuth, BookController.requestBook)
-
-
-export default booksRoutes;
+export default router;

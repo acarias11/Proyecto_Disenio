@@ -7,16 +7,22 @@ if (process.env.DB_HOST === undefined) {
 }
 
 // Configuración de la base de datos
-const db = new sql.ConnectionPool({
+const db = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    server: process.env.DB_HOST,
+    server: process.env.DB_HOST,  // Obtenido desde variables de entorno
     database: process.env.DB_NAME,
     options: {
         encrypt: true,
         trustServerCertificate: true 
     },
     connectionTimeout: 10000 
-})
+};
 
-export default db
+// Verificación para asegurar que server es un string
+if (!db.server || typeof db.server !== 'string') {
+    console.error('Error: DB_HOST debe ser una cadena de texto válida');
+    // No establecer valores por defecto para datos sensibles
+}
+
+export default db;

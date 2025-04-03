@@ -1,15 +1,64 @@
-### GET PARA USUARIOS
-GET http://localhost:3000/users
-
-### GET PARA LIBROS
-GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsImlhdCI6MTc0MzE4ODM5OCwiZXhwIjoxNzQzMTkwMTk4fQ.DJl_jvheOddZKYenGvambX3mZ5pubZVQXvWtGKjL_tI
-
-### Login
+### Login (Obtener token nuevo)
 POST http://localhost:3000/login
 Content-Type: application/json
 
 {
     "email": "AnaMartinez@gmail.com",
     "password": "anamart123"
+}
+
+### Obtener IDs de usuarios (para usar en solicitudes)
+GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjY5MjQxLCJleHAiOjE3NDM2NzEwNDF9.AFcb4ftjdFl313R-qAAqOpRbmZQ0D22cFSVyNTP08i4
+
+### GET PARA LIBROS
+GET http://localhost:3000/libros
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjY5MjQxLCJleHAiOjE3NDM2NzEwNDF9.AFcb4ftjdFl313R-qAAqOpRbmZQ0D22cFSVyNTP08i4
+
+### GET UN LIBRO POR ID 
+GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjY5MjQxLCJleHAiOjE3NDM2NzEwNDF9.AFcb4ftjdFl313R-qAAqOpRbmZQ0D22cFSVyNTP08i4
+
+### CREAR UN NUEVO LIBRO
+POST http://localhost:3000/libros
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjY5MjQxLCJleHAiOjE3NDM2NzEwNDF9.AFcb4ftjdFl313R-qAAqOpRbmZQ0D22cFSVyNTP08i4
+
+{
+    "nombre": "Crónica de una muerte anunciada",
+    "autor": "Gabriel Garcia Marquez",
+    "editorial": "Penguin Random House",
+    "estado": "Disponible",
+    "paginas": 120,
+    "idioma": "Español",
+    "descripcion": "Novela corta que relata el asesinato de Santiago Nasar a manos de los hermanos Vicario.",
+    "fecha_publicacion": "1981-01-01"
+}
+
+### ELIMINAR UN LIBRO 
+DELETE http://localhost:3000/libros/08B797F7-D8B7-4ECE-A952-FBA3DDCC7945
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjY5MjQxLCJleHAiOjE3NDM2NzEwNDF9.AFcb4ftjdFl313R-qAAqOpRbmZQ0D22cFSVyNTP08i4
+
+### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
+POST http://localhost:3000/libros/8AD55DF0-E102-4B35-A7CE-A360A3C7F295/solicitar
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjcxMzQ1LCJleHAiOjE3NDM2NzMxNDV9.gxXVLevK2bwPsoEJ2ZQkd3sXv1ZJbPSYoYuvSvI60F8
+
+{
+    "usuarioId": "0E4E5E0685D76B4F88FCE28FE17D36A1"
+}
+
+### VER TODAS LAS SOLICITUDES (solo admins)(Desoues de realizar la solicitud de un libro, se usa esta ruta para ver las solictudes pendientes)
+GET http://localhost:3000/libros/solicitudes/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjcxMzQ1LCJleHAiOjE3NDM2NzMxNDV9.gxXVLevK2bwPsoEJ2ZQkd3sXv1ZJbPSYoYuvSvI60F8
+
+### Actualizar estado de una solicitud (solo admins) (Despues de verificaer la solicitudes pendientes, se usa esta ruta para actualizar el estado del libro
+###Si en la tabla dice que esta disbonible, se cambia a prestado y viceversa y se pone el id de la solicitud, para eliminarla)
+PATCH http://localhost:3000/libros/estado/8AD55DF0-E102-4B35-A7CE-A360A3C7F295
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQzNjcxMzQ1LCJleHAiOjE3NDM2NzMxNDV9.gxXVLevK2bwPsoEJ2ZQkd3sXv1ZJbPSYoYuvSvI60F8
+
+{
+    "estado": "Disponible",
+    "solicitudId": 2
 }
