@@ -1,6 +1,11 @@
 import jsonwebtoken from 'jsonwebtoken';
+import sql from 'mssql'
 import { errorResponse, successResponse } from '../utils/response.js';
 import { verifyUser } from '../models/books.js';
+import db from '../config/database.js';
+
+const pool = new sql.ConnectionPool(db);
+const poolConnect = pool.connect();
 
 export default class AuthController {
     static login = async (req, res) => {
@@ -17,7 +22,7 @@ export default class AuthController {
                 return errorResponse(res, 400, 'El email no está registrado');
             }
             
-            // Procesar la contraseña almacenada
+            // Procesar la contraseña almacenada1.
             let storedPassword;
             
             if (Buffer.isBuffer(userData.Password)) {
@@ -57,32 +62,85 @@ export default class AuthController {
         }
     }
 
+
     static register = async (req, res) => {
         try {
             const userData = req.body;
-            // Aquí iría la lógica para registrar al usuario
-            successResponse(res, 201, userData, 'Usuario registrado correctamente');
+
+            const validation = validateUser(userData);
+
+            if (!validation.success) {
+                return errorResponse(res, 400, 'Datos inválidos', validation.error.format());
+            }
+
+            const existingUser = await verifyUser(userData.email);
+            if (existingUser) {
+                return errorResponse(res, 400, 'El email ya está registrado');
+            }
+
+            await createUser(userData);
+
+            const token = jsonwebtoken.sign({
+                email: userData.email,
+                Rol: userData.rol
+            }, process.env.SECRET_KEY || 'secretkey', {
+                expiresIn: '0.5h'
+            })
+
+            return successResponse(res, 201, {
+                name: userData.nombre,
+                email: userData.email,
+                role: userData.rol
+            }, 'Usuario registrado correctamente', token)
+
         } catch (error) {
-            errorResponse(res, 500, 'Error al registrar el usuario');
+            console.error('Error en register:', error);
+            return errorResponse(res, 500, 'Error al registrar el usuario')
         }
     }
 
     static registerAdmin = async (req, res) => {
         try {
             const userData = req.body;
-            // Aquí iría la lógica para registrar al administrador
-            successResponse(res, 201, userData, 'Administrador registrado correctamente');
+            
+            const validation = validateUser(userData)
+            if (!validation.success) {
+                return errorResponse(res, 400, 'Datos inválidos', validation.error.format());
+            }
+
+            const existingUser = await verifyUser(userData.email)
+            if (existingUser) {
+                return errorResponse(res, 400, 'El email ya está registrado');
+            }
+
+            await createUser(userData);
+
+            const token = jsonwebtoken.sign({
+                email: userData.email,
+                Rol: userData.rol
+            }, process.env.SECRET_KEY || 'secretkey', {
+                expiresIn: '0.5h'
+            });
+
+            return successResponse(res, 201, {
+                name: userData.nombre,
+                email: userData.email,
+                role: userData.rol
+            }, 'Administrador registrado correctamente', token)
+
         } catch (error) {
-            errorResponse(res, 500, 'Error al registrar el administrador');
+            console.error('Error en registerAdmin:', error);
+            return errorResponse(res, 500, 'Error al registrar el administrador');
         }
     }
 
     static getAllUsers = async (req, res) => {
         try {
-            // Aquí iría la lógica para obtener todos los usuarios
-            const users = []; // Simula obtener usuarios de la base de datos
+            const users = await getAllUsersDB();
             successResponse(res, 200, users, 'Usuarios obtenidos correctamente');
+            
         } catch (error) {
+            console.error('Error en getAllUsers:', error)
             errorResponse(res, 500, 'Error al obtener los usuarios');
         }
     }

@@ -600,3 +600,40 @@ export const verifyUser = async (email) => {
         throw error;
     }
 };
+
+export const createUser = async (userData) => {
+    try {
+        await poolConnect
+        const request = pool.request()
+
+        request.input('nombre', sql.NVarChar, userData.nombre)
+        request.input('email', sql.NVarChar, userData.email)
+        request.input('passoword', sql.NVarChar , userData.password)
+        request.input('rol', sql.NVarChar, userData.rol || 'User')
+
+        await request.query(`
+            INSERT INTO USUARIOS (Nombre, Email, Password, Rol)
+            VALUES (@nombre, @email, @password, @rol)
+        `)
+        return {success: true}
+    } catch(error){
+        console.error('Error en createUser', error)
+        throw error
+    }
+}
+
+export const getAllUsersDB = async () => {
+    try {
+        await poolConnect;
+        
+        const result = await pool.request().query(`
+            SELECT UsuarioID, Nombre, Email, Rol FROM USUARIOS
+        `);
+
+        return result.recordset
+
+    } catch (error) {
+        console.error('Error en getAllUsersDB:', error);
+        throw error
+    }
+};
