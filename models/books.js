@@ -1,35 +1,24 @@
 import sql from 'mssql';
 import db from '../config/database.js';
 
-// Crear pool de conexiones (singleton)
-let pool;
-if (!pool) {
-    pool = new sql.ConnectionPool(db);
-}
-const poolConnect = pool.connect();
-
-pool.on('error', err => {
-    console.error('Error en el pool de conexiones:', err);
-});
 
 // Función para registrar en bitácora mejorada
 export async function registrarEnBitácora(usuarioId, suceso) {
     try {
-        await poolConnect;
-        const request = pool.request();
-        
+        const pool = await db.connect();
+
         // Si no hay usuarioId, no registramos en bitácora
         if (!usuarioId) {
             console.log('No se registró en bitácora: usuarioId no proporcionado');
             return;
         }
-
+        
         // Si usuarioId es un email, buscar el ID real del usuario
         if (typeof usuarioId === 'string' && usuarioId.includes('@')) {
             const userQuery = await pool.request()
-                .input('email', sql.NVarChar, usuarioId)
-                .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
-                
+            .input('email', sql.NVarChar, usuarioId)
+            .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
+            
             if (userQuery.recordset.length > 0) {
                 usuarioId = userQuery.recordset[0].UsuarioID;
             } else {
@@ -68,6 +57,8 @@ export async function registrarEnBitácora(usuarioId, suceso) {
             return;
         }
 
+        const request = pool.request();
+        
         request.input('usuarioId', sql.Binary(16), usuarioIdBinary);
         request.input('suceso', sql.NVarChar, suceso);
         
@@ -87,7 +78,8 @@ export async function registrarEnBitácora(usuarioId, suceso) {
 // Modificar getAllBooks para manejar el caso de email
 export async function getAllBooks(usuarioId) {
     try {
-        await poolConnect;
+
+        const pool = await db.connect();
         
         const query = `
             SELECT 
@@ -129,7 +121,7 @@ export async function getAllBooks(usuarioId) {
 // Modificar getBookById para registrar en bitácora
 export async function getBookById(id, usuarioId) {
     try {
-        await poolConnect;
+        const pool = await db.connect();
         
         const request = pool.request();
         request.input('id', sql.UniqueIdentifier, id);
@@ -177,8 +169,10 @@ export async function getBookById(id, usuarioId) {
 // Modificar createBook para hacerla más robusta
 export async function createBook(bookData, usuarioId) {
     try {
-        await poolConnect;
-        const transaction = new sql.Transaction(pool);
+        
+        const pool = await db.connect();
+
+        const transaction = new sql.Transaction(db);
         
         await transaction.begin();
         
@@ -345,8 +339,9 @@ export async function createBook(bookData, usuarioId) {
 // Mejorar updateBookState para mostrar mensaje de eliminación de solicitud
 export async function updateBookState(id, estado, usuarioId, solicitudId = null) {
     try {
-        await poolConnect;
-        const transaction = new sql.Transaction(pool);
+        const pool = await db.connect();
+
+        const transaction = new sql.Transaction(db);
         
         await transaction.begin();
         
@@ -445,8 +440,9 @@ export async function updateBookState(id, estado, usuarioId, solicitudId = null)
 // Modificar requestBook para que NO cambie el estado del libro
 export async function requestBook(id, usuarioId) {
     try {
-        await poolConnect;
-        const transaction = new sql.Transaction(pool);
+        const pool = await db.connect();
+
+        const transaction = new sql.Transaction(db);
         
         await transaction.begin();
         
@@ -537,7 +533,7 @@ export async function requestBook(id, usuarioId) {
 // Función para obtener todas las solicitudes (solo para administradores)
 export async function getAllSolicitudes() {
     try {
-        await poolConnect;
+        const pool = await db.connect();
         
         const query = `
             SELECT 
@@ -574,66 +570,3 @@ export async function getAllSolicitudes() {
     }
 }
 
-export const verifyUser = async (email) => {
-    try {
-        await poolConnect;
-        const request = pool.request();
-        
-        request.input('email', sql.NVarChar, email);
-        
-        const result = await request.query(`
-            SELECT UsuarioID, Nombre, Email, 
-                   Password,
-                   CONVERT(VARCHAR(100), Password) AS PasswordString,
-                   Rol 
-            FROM USUARIOS 
-            WHERE Email = @email
-        `);
-        
-        if (result.recordset && result.recordset.length > 0) {
-            return result.recordset[0];
-        }
-        
-        return null;
-    } catch (error) {
-        console.error('Error en verifyUser:', error);
-        throw error;
-    }
-};
-
-export const createUser = async (userData) => {
-    try {
-        await poolConnect
-        const request = pool.request()
-
-        request.input('nombre', sql.NVarChar, userData.nombre)
-        request.input('email', sql.NVarChar, userData.email)
-        request.input('passoword', sql.NVarChar , userData.password)
-        request.input('rol', sql.NVarChar, userData.rol || 'User')
-
-        await request.query(`
-            INSERT INTO USUARIOS (Nombre, Email, Password, Rol)
-            VALUES (@nombre, @email, @password, @rol)
-        `)
-        return {success: true}
-    } catch(error){
-        console.error('Error en createUser', error)
-        throw error
-    }
-}
-
-export const getAllUsersDB = async () => {
-    try {
-        await poolConnect;
-        
-        const result = await pool.request().query(`
-            SELECT UsuarioID, Nombre, Email, Rol FROM USUARIOS
-        `);
-
-        return result.recordset
-
-    } catch (error) {
-        console.error('Error en getAllUsersDB:', error);
-        throw error
-    }
-};

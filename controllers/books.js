@@ -7,7 +7,7 @@ export default class BookController {
     static getAll = async (req, res) => {
         try {
             // Obtener el ID del usuario desde el token
-            const usuarioId = req.user?.email ? req.user.email : null;
+            const usuarioId = req.params.email;
             
             const result = await BookModel.getAllBooks(usuarioId)
             successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
@@ -19,7 +19,7 @@ export default class BookController {
     static getById = async (req, res) => {
         const { id } = req.params
         // Obtener el ID del usuario desde el token
-        const usuarioId = req.user?.email ? req.user.email : null;
+        const usuarioId = req.params.email;
 
         try {
             const result = await BookModel.getBookById(id, usuarioId)
@@ -38,7 +38,7 @@ export default class BookController {
         const data = req.body
         const validation = validateBook(data)
         // Obtener el ID del usuario desde el token
-        const usuarioId = req.user?.email ? req.user.email : null;
+        const usuarioId = req.params.email;
 
         if (!validation.success) {
             return errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
@@ -56,7 +56,7 @@ export default class BookController {
         const id = req.params.id;
         const { estado, solicitudId } = req.body;
         // Obtener el ID del usuario desde el token
-        const usuarioId = req.user?.email ? req.user.email : null;
+        const usuarioId = req.params.email;
 
         if (!estado || !['Disponible', 'Prestado'].includes(estado)) {
             return errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
@@ -86,7 +86,7 @@ export default class BookController {
         const id = req.params.id
         const data = req.body
         // Obtener el ID del usuario desde el token
-        const usuarioId = req.user?.email ? req.user.email : null;
+        const usuarioId = req.params.email;
         
         const validation = validateBookPartial(data)
         
@@ -108,7 +108,7 @@ export default class BookController {
     static delete = async (req, res) => {
         const { id } = req.params
         // Obtener el ID del usuario desde el token
-        const usuarioId = req.user?.email ? req.user.email : null;
+        const usuarioId = req.params.email;
 
         try {
             const result = await BookModel.deleteBook(id, usuarioId)

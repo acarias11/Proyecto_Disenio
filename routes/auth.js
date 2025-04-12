@@ -29,6 +29,6 @@ authRoutes.post("/register", AuthController.register);
 authRoutes.post("/registerAdmin", [isAuth, isAdmin], AuthController.registerAdmin);
 
 // Obtener los usuarios registrados
-authRoutes.get("/registeredUsers", [isAuth, isAdmin], AuthController.getAllUsers);
+// authRoutes.get("/registeredUsers", [isAuth, isAdmin], AuthController.registeredUsers);
 
 export default authRoutes;

@@ -1,9 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRouter from './routes/auth.js';
-import booksRouter from './routes/books.js';
-import { userRouter } from './routes/users.js';
+import authRoutes from './routes/auth.js';
+import booksRoutes from './routes/books.js';
+import userRoutes from './routes/users.js';
 
 // Cargar variables de entorno desde el archivo .env
 dotenv.config();
@@ -18,9 +18,9 @@ app.use(cors());
 app.use(express.json());
 
 // Registrar rutas
-app.use('/', authRouter);
-app.use('/libros', booksRouter);
-app.use('/users', userRouter);
+app.use('/', authRoutes);
+app.use('/libros', booksRoutes);
+app.use('/users', userRoutes);
 
 app.get('/', (req, res) => {
     res.send('Bienvenido a mi biblioteca virtual!');
