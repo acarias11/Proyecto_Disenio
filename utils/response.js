@@ -1,12 +1,13 @@
-export const errorResponse = (res, statusCode, message) => {
+export const errorResponse = (res, statusCode, message, error) => {
     res.status(statusCode).json({ 
         success: false, 
-        message 
+        message,
+        error: error
     });
 };
 
 export const successResponse = (res, statusCode, data, message, token) => {
-    res.status(statusCode).json({
+    return res.status(statusCode).json({
         success: true,
         message, 
         data,

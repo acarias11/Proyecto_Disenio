@@ -1,20 +1,25 @@
 import jsonwebtoken from 'jsonwebtoken';
 import { errorResponse, successResponse } from '../utils/response.js';
 import * as AuthModel from '../models/auth.js';
-import { validateUser } from '../schemas/schema.js';
+import { validateUser, validateUserPartial } from '../schemas/schema.js';
 
 export default class AuthController {
     static login = async (req, res) => {
         const { email, password } = req.body;
 
-        if(!email){
-            errorResponse(res, 400, 'El email es requerido');
+        if(!email || !password){
+            errorResponse(res, 400, 'Los datos ingresados son inválidos');
         }
 
         try {
             const userData = await AuthModel.verifyUser(email);
             if(!userData){
                 errorResponse(res, 400, 'El email no está registrado');
+            }
+
+            // Verificar si el usuario está verificado
+            if (!userData.Verificado) {
+                errorResponse(res, 400, 'El usuario no está verificado');
             }
             
             // Procesar la contraseña almacenada1.
@@ -55,7 +60,6 @@ export default class AuthController {
 
         } catch (error) {
             console.error('Error en login:', error);
-            errorResponse(res, 500, 'Error interno del servidor');
         }
     }
 
@@ -64,10 +68,12 @@ export default class AuthController {
         try {
             const userData = req.body;
 
-            const validation = validateUser(userData);
+            const validation = validateUserPartial(userData);
 
             if (!validation.success) {
-                errorResponse(res, 400, 'Datos inválidos', validation.error.format());
+                errorResponse(res, 400, 'Datos inválidos', 
+                    `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
+                );
             }
 
             const existingUser = await AuthModel.verifyUser(userData.email);
@@ -76,24 +82,23 @@ export default class AuthController {
                 errorResponse(res, 400, 'El email ya está registrado');
             }
 
-            await AuthModel.createUser(userData);
+            const newUser = await AuthModel.createUser(userData);
 
             const token = jsonwebtoken.sign({
-                email: userData.email,
-                rol: userData.Rol
+                email: newUser.email,
+                rol: newUser.Rol
             }, process.env.SECRET_KEY, {
                 expiresIn: '0.5h'
             })
 
             successResponse(res, 201, {
-                name: userData.nombre,
-                email: userData.email,
-                role: userData.Rol
+                name: newUser.nombre,
+                email: newUser.email,
+                role: newUser.Rol
             }, 'Usuario registrado correctamente', token)
 
         } catch (error) {
             console.error('Error en register:', error);
-            errorResponse(res, 500, 'Error al registrar el usuario')
         }
     }
 
@@ -103,7 +108,8 @@ export default class AuthController {
             
             const validation = validateUser(userData)
             if (!validation.success) {
-                errorResponse(res, 400, 'Datos inválidos', validation.error.format());
+                errorResponse(res, 400, 'Datos inválidos', 
+                    `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`);
             }
 
             const existingUser = await AuthModel.verifyUser(userData.email)
@@ -128,7 +134,6 @@ export default class AuthController {
 
         } catch (error) {
             console.error('Error en registerAdmin:', error);
-            errorResponse(res, 500, 'Error al registrar el administrador');
         }
     }
 }

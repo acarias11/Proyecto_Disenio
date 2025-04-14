@@ -1,28 +1,29 @@
 import sql from 'mssql';
 import db from '../config/database.js';
+import { nullable } from 'zod';
 
 
 // Función para registrar en bitácora mejorada
-export async function registrarEnBitácora(usuarioId, suceso) {
+export async function registrarEnBitácora(usuarioEmail, suceso) {
     try {
         const pool = await db.connect();
 
-        // Si no hay usuarioId, no registramos en bitácora
-        if (!usuarioId) {
-            console.log('No se registró en bitácora: usuarioId no proporcionado');
+        // Si no hay usuarioEmail, no registramos en bitácora
+        if (!usuarioEmail) {
+            console.log('No se registró en bitácora: usuarioEmail no proporcionado');
             return;
         }
         
-        // Si usuarioId es un email, buscar el ID real del usuario
-        if (typeof usuarioId === 'string' && usuarioId.includes('@')) {
+        // Si usuarioEmail es un email, buscar el ID real del usuario
+        if (typeof usuarioEmail === 'string' && usuarioEmail.includes('@')) {
             const userQuery = await pool.request()
-            .input('email', sql.NVarChar, usuarioId)
+            .input('email', sql.NVarChar, usuarioEmail)
             .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
             
             if (userQuery.recordset.length > 0) {
-                usuarioId = userQuery.recordset[0].UsuarioID;
+                usuarioEmail = userQuery.recordset[0].UsuarioID;
             } else {
-                console.log(`No se encontró usuario con email: ${usuarioId}`);
+                console.log(`No se encontró usuario con email: ${usuarioEmail}`);
                 return;
             }
         }
@@ -30,41 +31,41 @@ export async function registrarEnBitácora(usuarioId, suceso) {
         // Convertir el ID de usuario al formato binario correcto
         let usuarioIdBinary;
         
-        if (Buffer.isBuffer(usuarioId)) {
+        if (Buffer.isBuffer(usuarioEmail)) {
             // Ya es un Buffer, asegurar que sea de 16 bytes
-            usuarioIdBinary = usuarioId.length === 16 ? usuarioId : Buffer.alloc(16).fill(usuarioId, 0, Math.min(16, usuarioId.length));
+            usuarioIdBinary = usuarioEmail.length === 16 ? usuarioEmail : Buffer.alloc(16).fill(usuarioEmail, 0, Math.min(16, usuarioEmail.length));
         } 
-        else if (typeof usuarioId === 'string') {
-            if (usuarioId.match(/^[0-9a-fA-F]+$/)) {
+        else if (typeof usuarioEmail === 'string') {
+            if (usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
                 // Es hexadecimal, normalizar a 32 caracteres (16 bytes)
-                const normalizedHex = usuarioId.padStart(32, '0').substring(0, 32);
+                const normalizedHex = usuarioEmail.padStart(32, '0').substring(0, 32);
                 usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
             } 
             else {
                 // No es hexadecimal, convertir a buffer de 16 bytes
-                usuarioIdBinary = Buffer.alloc(16).fill(usuarioId, 0, Math.min(16, usuarioId.length));
+                usuarioIdBinary = Buffer.alloc(16).fill(usuarioEmail, 0, Math.min(16, usuarioEmail.length));
             }
         } 
         else {
             // Otro tipo, convertir a string y luego a buffer
-            const strValue = String(usuarioId);
+            const strValue = String(usuarioEmail);
             usuarioIdBinary = Buffer.alloc(16).fill(strValue, 0, Math.min(16, strValue.length));
         }
         
         // Verificar que el buffer sea válido y tenga la longitud correcta
         if (!Buffer.isBuffer(usuarioIdBinary) || usuarioIdBinary.length !== 16) {
-            console.error('Error: Buffer inválido para usuarioId:', usuarioIdBinary);
+            console.error('Error: Buffer inválido para usuarioEmail:', usuarioIdBinary);
             return;
         }
 
         const request = pool.request();
         
-        request.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+        request.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
         request.input('suceso', sql.NVarChar, suceso);
         
         const query = `
             INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-            VALUES (@usuarioId, @suceso, GETDATE())
+            VALUES (@usuarioEmail, @suceso, GETDATE())
         `;
         
         await request.query(query);
@@ -76,11 +77,45 @@ export async function registrarEnBitácora(usuarioId, suceso) {
 }
 
 // Modificar getAllBooks para manejar el caso de email
-export async function getAllBooks(usuarioId) {
-    try {
-
+export async function getAllBooks(usuarioEmail, { genre = null, author = null, editorial = null }) {
         const pool = await db.connect();
+
+        const request = pool.request();
         
+        const filtros = [];
+        
+        if (genre){
+            const genreRequest = pool.request()
+            
+            genreRequest.input('genre', sql.NVarChar, genre);
+
+            const genreQuery = `SELECT DISTINCT LibroID FROM GeneroLibro AS GL
+            INNER JOIN Genero AS G ON GL.GeneroID = G.GeneroID
+            WHERE G.Nombre = @genre`;
+            
+            const genreResult = await genreRequest.query(genreQuery);
+
+            const libroIds = genreResult.recordset.map(row => `'${row.LibroID}'`).join(', ');
+
+            if (libroIds.length > 0) {
+                filtros.push(`L.LibroID IN (${libroIds})`);
+            }
+        }
+        if (author) {
+            filtros.push(`A.Nombre LIKE @author`);
+            request.input('author', sql.NVarChar, `%${author}%`);
+        }
+        if (editorial) {
+            filtros.push(`E.Nombre LIKE @editorial`);
+            request.input('editorial', sql.NVarChar, `%${editorial}%`);   
+        }
+        
+        let condicion = ``;
+
+        if (filtros.length > 0) {
+            condicion = ` WHERE ` + filtros.join(' AND ');
+        }
+
         const query = `
             SELECT 
                 L.LibroID, 
@@ -98,29 +133,21 @@ export async function getAllBooks(usuarioId) {
             JOIN Editorial E ON L.EditorialID = E.EditorialID
             LEFT JOIN LibroDetalle LD ON L.LibroID = LD.LibroID
             LEFT JOIN Edicion ED ON L.LibroID = ED.LibroID
-        `;
+        ${condicion}`;
 
-        const result = await pool.request().query(query);
+        const result = await request.query(query);
         
         // Intentar registrar en bitácora, pero capturar errores para que no interrumpan
-        try {
-            if (usuarioId) {
-                await registrarEnBitácora(usuarioId, 'Consulta de todos los libros');
-            }
-        } catch (bitacoraError) {
-            console.error('Error al registrar en bitácora:', bitacoraError);
+        if (usuarioEmail) {
+            await registrarEnBitácora(usuarioEmail, 'Consulta de los libros');
         }
-        
+            
         return result.recordset;
-    } catch (error) {
-        console.error('Error al obtener libros:', error);
-        throw error;
-    }
 }
 
 // Modificar getBookById para registrar en bitácora
-export async function getBookById(id, usuarioId) {
-    try {
+export async function getBookById(id, usuarioEmail) {
+    
         const pool = await db.connect();
         
         const request = pool.request();
@@ -155,19 +182,15 @@ export async function getBookById(id, usuarioId) {
         }
         
         // Registrar en bitácora
-        if (usuarioId) {
-            await registrarEnBitácora(usuarioId, `Consulta del libro: ${result.recordset[0].Nombre}`);
+        if (usuarioEmail) {
+            await registrarEnBitácora(usuarioEmail, `Consulta del libro: ${result.recordset[0].Nombre}`);
         }
         
         return result.recordset[0];
-    } catch (error) {
-        console.error('Error al obtener libro por ID:', error);
-        throw error;
-    }
 }
 
 // Modificar createBook para hacerla más robusta
-export async function createBook(bookData, usuarioId) {
+export async function createBook(bookData, usuarioEmail) {
     try {
         
         const pool = await db.connect();
@@ -255,34 +278,34 @@ export async function createBook(bookData, usuarioId) {
             
             await edicionRequest.query(insertEdicionQuery);
             
-            // 6. Registrar en bitácora (solo si usuarioId está disponible y de forma opcional)
-            if (usuarioId) {
+            // 6. Registrar en bitácora (solo si usuarioEmail está disponible y de forma opcional)
+            if (usuarioEmail) {
                 try {
                     console.log("Registrando en bitácora");
                     // Buscar el ID binario del usuario si se proporciona un email
                     let usuarioIdBinary;
                     
-                    if (typeof usuarioId === 'string' && usuarioId.includes('@')) {
+                    if (typeof usuarioEmail === 'string' && usuarioEmail.includes('@')) {
                         const userQuery = await transaction.request()
-                            .input('email', sql.NVarChar, usuarioId)
+                            .input('email', sql.NVarChar, usuarioEmail)
                             .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
                             
                         if (userQuery.recordset.length > 0) {
                             usuarioIdBinary = userQuery.recordset[0].UsuarioID;
                         } else {
-                            console.log('No se encontró usuario con email:', usuarioId);
+                            console.log('No se encontró usuario con email:', usuarioEmail);
                             // Continuamos sin registrar en bitácora
                         }
                     } else {
                         // Intentar convertir a buffer con la longitud correcta
                         try {
-                            if (Buffer.isBuffer(usuarioId)) {
-                                usuarioIdBinary = usuarioId;
-                            } else if (typeof usuarioId === 'string') {
-                                if (usuarioId.startsWith('0x')) {
-                                    usuarioIdBinary = Buffer.from(usuarioId.substring(2), 'hex');
+                            if (Buffer.isBuffer(usuarioEmail)) {
+                                usuarioIdBinary = usuarioEmail;
+                            } else if (typeof usuarioEmail === 'string') {
+                                if (usuarioEmail.startsWith('0x')) {
+                                    usuarioIdBinary = Buffer.from(usuarioEmail.substring(2), 'hex');
                                 } else {
-                                    usuarioIdBinary = Buffer.from(usuarioId, 'hex');
+                                    usuarioIdBinary = Buffer.from(usuarioEmail, 'hex');
                                 }
                             }
                             
@@ -293,19 +316,19 @@ export async function createBook(bookData, usuarioId) {
                                 usuarioIdBinary = newBuffer;
                             }
                         } catch (bufferError) {
-                            console.log('Error al convertir usuarioId a buffer:', bufferError);
+                            console.log('Error al convertir usuarioEmail a buffer:', bufferError);
                             // Continuamos sin registrar en bitácora
                         }
                     }
                     
                     if (usuarioIdBinary) {
                         const bitacoraRequest = new sql.Request(transaction);
-                        bitacoraRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+                        bitacoraRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
                         bitacoraRequest.input('suceso', sql.NVarChar, `Creación del libro: ${bookData.nombre}`);
                         
                         await bitacoraRequest.query(`
                             INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-                            VALUES (@usuarioId, @suceso, GETDATE())
+                            VALUES (@usuarioEmail, @suceso, GETDATE())
                         `);
                     }
                 } catch (bitacoraError) {
@@ -328,16 +351,14 @@ export async function createBook(bookData, usuarioId) {
                 await transaction.rollback();
                 console.log("Transacción cancelada (rollback)");
             }
-            throw error;
         }
     } catch (error) {
         console.error('Error al crear libro:', error);
-        throw error;
     }
 }
 
 // Mejorar updateBookState para mostrar mensaje de eliminación de solicitud
-export async function updateBookState(id, estado, usuarioId, solicitudId = null) {
+export async function updateBookState(id, estado, usuarioEmail, solicitudId = null) {
     try {
         const pool = await db.connect();
 
@@ -380,19 +401,19 @@ export async function updateBookState(id, estado, usuarioId, solicitudId = null)
             }
             
             // Registrar en bitácora
-            if (usuarioId) {
+            if (usuarioEmail) {
                 const bitacoraRequest = new sql.Request(transaction);
                 
                 // Convertir el ID de usuario a formato binario si es necesario
                 let usuarioIdBinary;
-                if (typeof usuarioId === 'string' && usuarioId.match(/^[0-9a-fA-F]+$/)) {
+                if (typeof usuarioEmail === 'string' && usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
                     // Es un string hexadecimal, conviértelo a Buffer
-                    const normalizedHex = usuarioId.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
+                    const normalizedHex = usuarioEmail.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
                     usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
-                } else if (typeof usuarioId === 'string' && usuarioId.includes('@')) {
+                } else if (typeof usuarioEmail === 'string' && usuarioEmail.includes('@')) {
                     // Es un email, buscar el ID real
                     const userQuery = await pool.request()
-                        .input('email', sql.NVarChar, usuarioId)
+                        .input('email', sql.NVarChar, usuarioEmail)
                         .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
                         
                     if (userQuery.recordset.length > 0) {
@@ -400,16 +421,16 @@ export async function updateBookState(id, estado, usuarioId, solicitudId = null)
                     }
                 } else {
                     // Ya es un Buffer o un valor binario
-                    usuarioIdBinary = usuarioId;
+                    usuarioIdBinary = usuarioEmail;
                 }
                 
                 if (usuarioIdBinary) {
-                    bitacoraRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+                    bitacoraRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
                     bitacoraRequest.input('suceso', sql.NVarChar, `Actualización del estado del libro ID ${id} a "${estado}"`);
                     
                     await bitacoraRequest.query(`
                         INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-                        VALUES (@usuarioId, @suceso, GETDATE())
+                        VALUES (@usuarioEmail, @suceso, GETDATE())
                     `);
                 }
             }
@@ -429,17 +450,14 @@ export async function updateBookState(id, estado, usuarioId, solicitudId = null)
             if (!transaction._aborted) {
                 await transaction.rollback();
             }
-            throw error;
         }
     } catch (error) {
         console.error('Error al actualizar estado del libro:', error);
-        throw error;
     }
 }
 
 // Modificar requestBook para que NO cambie el estado del libro
-export async function requestBook(id, usuarioId) {
-    try {
+export async function requestBook(id, usuarioEmail) {
         const pool = await db.connect();
 
         const transaction = new sql.Transaction(db);
@@ -473,36 +491,36 @@ export async function requestBook(id, usuarioId) {
             
             // Convertir el ID de usuario a formato binario si viene en formato hexadecimal
             let usuarioIdBinary;
-            if (typeof usuarioId === 'string' && usuarioId.match(/^[0-9a-fA-F]+$/)) {
+            if (typeof usuarioEmail === 'string' && usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
                 // Es un string hexadecimal, conviértelo a Buffer
-                const normalizedHex = usuarioId.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
+                const normalizedHex = usuarioEmail.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
                 usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
             } else {
                 // Ya es un Buffer o un valor binario
-                usuarioIdBinary = usuarioId;
+                usuarioIdBinary = usuarioEmail;
             }
             
             // Insertar en la tabla Solicitud
             const solicitudRequest = new sql.Request(transaction);
-            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+            solicitudRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
             solicitudRequest.input('libroId', sql.UniqueIdentifier, id);
             
             const solicitudQuery = `
                 INSERT INTO Solicitud (UsuarioID, LibroID, FechaSolicitud)
                 OUTPUT INSERTED.SolicitudID
-                VALUES (@usuarioId, @libroId, GETDATE())
+                VALUES (@usuarioEmail, @libroId, GETDATE())
             `;
             const solicitudResult = await solicitudRequest.query(solicitudQuery);
             const solicitudId = solicitudResult.recordset[0].SolicitudID;
             
             // Registrar en Bitacora
             const bitacoraRequest = new sql.Request(transaction);
-            bitacoraRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+            bitacoraRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
             bitacoraRequest.input('suceso', sql.NVarChar, `Solicitud del libro: ${nombreLibro} (ID: ${id})`);
             
             const bitacoraQuery = `
                 INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-                VALUES (@usuarioId, @suceso, GETDATE())
+                VALUES (@usuarioEmail, @suceso, GETDATE())
             `;
             await bitacoraRequest.query(bitacoraQuery);
             
@@ -522,17 +540,12 @@ export async function requestBook(id, usuarioId) {
             if (!transaction._aborted) {
                 await transaction.rollback();
             }
-            throw error;
         }
-    } catch (error) {
-        console.error('Error al solicitar libro:', error);
-        throw error;
-    }
+
 }
 
 // Función para obtener todas las solicitudes (solo para administradores)
 export async function getAllSolicitudes() {
-    try {
         const pool = await db.connect();
         
         const query = `
@@ -564,9 +577,5 @@ export async function getAllSolicitudes() {
         }));
         
         return solicitudes;
-    } catch (error) {
-        console.error('Error al obtener solicitudes:', error);
-        throw error;
-    }
 }
 

@@ -6,67 +6,80 @@ export default class BookController {
 
     static getAll = async (req, res) => {
         try {
-            // Obtener el ID del usuario desde el token
-            const usuarioId = req.params.email;
+            // Obtener el email del usuario desde el token
+            const usuarioEmail = req.params.email;
+
+            let { genre, author, editorial } = req.query
+
+            if (genre) genre = genre.replace(/%/g, " ")
             
-            const result = await BookModel.getAllBooks(usuarioId)
+            if (author) author = author.replace(/%/g, ' ')
+             
+            if(editorial) editorial = editorial.replace(/%/g, ' ')
+
+            const result = await BookModel.getAllBooks(usuarioEmail, { genre, author, editorial })
+
             successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
         } catch (err){
-            errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
+            // errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
+            console.error(err)
         }
     }
 
     static getById = async (req, res) => {
         const { id } = req.params
-        // Obtener el ID del usuario desde el token
-        const usuarioId = req.params.email;
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
 
         try {
-            const result = await BookModel.getBookById(id, usuarioId)
+            const result = await BookModel.getBookById(id, usuarioEmail)
 
             if (!result) {
                 errorResponse(res, 404, 'Libro no encontrado')
-                return
-            }
+                            }
             successResponse(res, 200, result, 'Libro obtenido correctamente')
         } catch(err) {
-            errorResponse(res, 500, 'Error al obtener el libro', err.message)
+            // errorResponse(res, 500, 'Error al obtener el libro', err.message)
+            console.error(err)
         }
     }
 
     static create = async (req, res) => {
         const data = req.body
         const validation = validateBook(data)
-        // Obtener el ID del usuario desde el token
-        const usuarioId = req.params.email;
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
 
         if (!validation.success) {
-            return errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
+            errorResponse(res, 400, 'Datos del libro inválidos', 
+                `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
+            )
         }
 
         try {
-            const result = await BookModel.createBook(data, usuarioId)
-            return successResponse(res, 201, result, 'Libro creado exitosamente');
+            const result = await BookModel.createBook(data, usuarioEmail)
+            successResponse(res, 201, result, 'Libro creado exitosamente');
         } catch (err) {
-            return errorResponse(res, 500, 'Error al crear libro', err.message);
+            // errorResponse(res, 500, 'Error al crear libro', err.message);
+            console.error(err)
         }
     }
 
     static updateState = async (req, res) => {
         const id = req.params.id;
         const { estado, solicitudId } = req.body;
-        // Obtener el ID del usuario desde el token
-        const usuarioId = req.params.email;
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
 
         if (!estado || !['Disponible', 'Prestado'].includes(estado)) {
-            return errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
+            errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
         }
 
         try {
-            const result = await BookModel.updateBookState(id, estado, usuarioId, solicitudId);
+            const result = await BookModel.updateBookState(id, estado, usuarioEmail, solicitudId);
             
             if (!result.success) {
-                return errorResponse(res, 404, result.message);
+                errorResponse(res, 404, result.message);
             }
             
             // Personalizar el mensaje según si se eliminó una solicitud
@@ -78,67 +91,68 @@ export default class BookController {
             successResponse(res, 200, result.libro, mensaje);
         }
         catch(err){
-            errorResponse(res, 500, 'Error al actualizar el estado del libro', err.message);
+            // errorResponse(res, 500, 'Error al actualizar el estado del libro', err.message);
+            console.error(err)
         }
     }
 
     static update = async (req, res) => {
         const id = req.params.id
         const data = req.body
-        // Obtener el ID del usuario desde el token
-        const usuarioId = req.params.email;
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
         
         const validation = validateBookPartial(data)
         
         if (!validation.success) {
-            return errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
+            errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
         }
 
         try {
-            const result = await BookModel.updateBook(id, data, usuarioId)
+            const result = await BookModel.updateBook(id, data, usuarioEmail)
             if (!result) {
-                return errorResponse(res, 404, 'Libro no encontrado')
+                errorResponse(res, 404, 'Libro no encontrado')
             }
             successResponse(res, 200, result, 'Libro actualizado correctamente')
         } catch(error){
-            errorResponse(res, 500, 'Error al actualizar el libro', error.message)
+            console.error(error)
         }
     }
 
     static delete = async (req, res) => {
         const { id } = req.params
-        // Obtener el ID del usuario desde el token
-        const usuarioId = req.params.email;
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
 
         try {
-            const result = await BookModel.deleteBook(id, usuarioId)
+            const result = await BookModel.deleteBook(id, usuarioEmail)
             if (!result) {
-                return errorResponse(res, 404, 'Libro no encontrado')
+                errorResponse(res, 404, 'Libro no encontrado')
             }
             successResponse(res, 200, null, 'Libro eliminado correctamente')
         } catch (err) {
-            errorResponse(res, 500, 'Error al eliminar el libro', err.message)
+            console.error(err)
         }
     }
 
     static requestBook = async (req, res) => {
         const { id } = req.params;
-        const { usuarioId } = req.body;
+        const { usuarioEmail } = req.body;
 
-        if (!usuarioId) {
-            return errorResponse(res, 400, 'ID de usuario requerido');
+        if (!usuarioEmail) {
+            errorResponse(res, 400, 'ID de usuario requerido');
         }
 
         try {
-            const result = await BookModel.requestBook(id, usuarioId);
+            const result = await BookModel.requestBook(id, usuarioEmail);
             
             if (!result.success) {
-                return errorResponse(res, 404, result.message);
+                errorResponse(res, 404, result.message);
             }
             
             successResponse(res, 200, result, 'Solicitud de libro registrada correctamente');
         } catch (err) {
-            errorResponse(res, 500, 'Error al procesar la solicitud del libro', err.message);
+            console.error(err);
         }
     }
 
@@ -147,7 +161,8 @@ export default class BookController {
             const solicitudes = await BookModel.getAllSolicitudes();
             successResponse(res, 200, solicitudes, 'Solicitudes obtenidas correctamente');
         } catch (err) {
-            errorResponse(res, 500, 'Error al obtener las solicitudes', err.message);
+            // errorResponse(res, 500, 'Error al obtener las solicitudes', err.message);
+            console.error(err);
         }
     }
 }

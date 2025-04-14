@@ -6,24 +6,11 @@ if (process.env.DB_HOST === undefined) {
     dotenv.config();
 }
 
-// Configuración de la base de datos
-// const db = {
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PASSWORD,
-//     server: process.env.DB_HOST,  // Obtenido desde variables de entorno
-//     database: process.env.DB_NAME,
-//     options: {
-//         encrypt: true,
-//         trustServerCertificate: true 
-//     },
-//     connectionTimeout: 10000 
-// };
-
 // Creando pool de conexiones a la base de datos
 const db = new sql.ConnectionPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    server: process.env.DB_HOST,  // Obtenido desde variables de entorno
+    server: process.env.DB_HOST, 
     database: process.env.DB_NAME,
     options: {
         encrypt: true,

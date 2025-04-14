@@ -15,28 +15,66 @@ Content-Type: application/json
     "email": "LuisGomez@gmail.com",
     "password": "Lg0m3z"
 }
+
+### Login usuario corriente (No verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "jhernandez19@outlook.com",
+    "password": "jhndez1234"
+}
+### Registrar un nuevo usuario 
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "nombre": "Enrique Barahona",
+    "email": "errbaraho2@gmail.com",
+    "password": "EnrriqBarr@123"
+}
+
+### Registrar un nuevo usuario (con rol admin)
+POST http://localhost:3000/registerAdmin
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NTk0NDc5LCJleHAiOjE3NDQ1OTYyNzl9.s7E7oSPKBNJSBV0ZsoLGJTbEnMDH4pv_dkdloAZnLBA
+
+{
+    "nombre": "Tulio Gonzalez",
+    "email": "tlgonzalez22@hotmail.com",
+    "password": "TulioGonzalez123",
+    "rol": "Admin",
+    "verificado": 1
+}
+
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NTAwNzk2LCJleHAiOjE3NDQ1MDI1OTZ9.3YZ8VO12ICHzSqMGnt28fbJtjwLQFB_aBor5RxSnUDw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjU3ODgwLCJleHAiOjE3NDQ2NTk2ODB9.zP8L4-FXNdkgQ3VujLVxJI8pSCwIa_ddz7WofGuqDrM
+
+### GET PARA LIBROS con filtros
+GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjYzNzY3LCJleHAiOjE3NDQ2NjU1Njd9.Mv-OR7kYSXeGDIWgJYzkWf9mXT5WMIvvyGbIftUmuTA
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NTAwNzk2LCJleHAiOjE3NDQ1MDI1OTZ9.3YZ8VO12ICHzSqMGnt28fbJtjwLQFB_aBor5RxSnUDw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjY0NTk1LCJleHAiOjE3NDQ2NjYzOTV9.gPZGeOrq7a8fmnE-ivYZ2TEK92yDYkYuWpDEMZ4vRpE
+
 
 ### GET UN LIBRO POR ID 
 GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NDk5MDQxLCJleHAiOjE3NDQ1MDA4NDF9.GQWfPczkmuJM2xR-0CrwoQti0rLpGz9LDkswx9kPc0o
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjY0NTk1LCJleHAiOjE3NDQ2NjYzOTV9.gPZGeOrq7a8fmnE-ivYZ2TEK92yDYkYuWpDEMZ4vRpE
 
 ### CREAR UN NUEVO LIBRO
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsIlJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NDk1Njg3LCJleHAiOjE3NDQ0OTc0ODd9.LHCq3Pk2TocJXnXv52LzHBX4u8UAK63bEi06gUk0T3s
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjY0NTk1LCJleHAiOjE3NDQ2NjYzOTV9.gPZGeOrq7a8fmnE-ivYZ2TEK92yDYkYuWpDEMZ4vRpE
 
 {
     "nombre": "Crónica de una muerte anunciada",
     "autor": "Gabriel Garcia Marquez",
     "editorial": "Penguin Random House",
     "estado": "Disponible",
+    "rating": 4.5,
     "paginas": 120,
     "idioma": "Español",
     "descripcion": "Novela corta que relata el asesinato de Santiago Nasar a manos de los hermanos Vicario.",
