@@ -116,7 +116,7 @@ export default class AuthController {
 
             const email = userData.email
 
-            const existingUser = await AuthModel.verifyUser(email)
+            const existingUser = await AuthModel.verifyUser({ email })
             if (existingUser) {
                 errorResponse(res, 400, 'El email ya está registrado');
             }
