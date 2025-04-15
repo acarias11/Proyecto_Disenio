@@ -11,14 +11,14 @@ export default class UserController {
         const users = await UserModel.getAllUsersDB(userEmail);
 
         if (!users) {
-            errorResponse(res, 404, 'No se encontraron usuarios');
+            return errorResponse(res, 404, 'No se encontraron usuarios');
         }
 
         successResponse(res, 200, users, 'Usuarios obtenidos correctamente');
         
     } catch (error) {
         console.error('Error al obtener los usuarios:', error)
-        // errorResponse(res, 500, 'Error al obtener los usuarios');
+        // return errorResponse(res, 500, 'Error al obtener los usuarios');
     } }
 
     static verificarUsuario = async (req, res) => {
@@ -30,11 +30,11 @@ export default class UserController {
             const userExists = await verifyUser({ id });
 
         if (!userExists) {
-            errorResponse(res, 404, 'El usuario ingresado no existe');
+            return errorResponse(res, 404, 'El usuario ingresado no existe');
         }
 
         if (userExists.verificado) {
-            errorResponse(res, 400, 'El usuario ya está verificado');
+            return errorResponse(res, 400, 'El usuario ya está verificado');
         }
 
         const verificarUsuario = await UserModel.verificarUsuario({id, usuarioEmail});

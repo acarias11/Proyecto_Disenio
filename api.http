@@ -34,6 +34,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
     "id": "A9386387-73A4-4C94-BA8D-3B2F7DE452C4"
 }
 
+### Login usuario corriente (No verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "errbaraho2@gmail.com",
+    "password": "EnrriqBarr@123"
+}
 ### Registrar un nuevo usuario 
 POST http://localhost:3000/register
 Content-Type: application/json
@@ -59,7 +67,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzQwNzM5LCJleHAiOjE3NDQ3NDI1Mzl9.TS9kt8gqRzaKKu687xxpL_etUTVPpHk86AmsPO9Z1L4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzQ0MjY4LCJleHAiOjE3NDQ3NDYwNjh9._XYaIZiIdJYM-yUzr9smdgEaWtJfeEqXzijqgzTGxoM
 
 ### GET PARA LIBROS con filtros
 GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
@@ -126,3 +134,25 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Ver historial de eventos de un usuario (solo admins)
 GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+
+### Crear un nuevo autor
+POST http://localhost:3000/libros/author
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzUwMDAzLCJleHAiOjE3NDQ3NTE4MDN9.T8Ooinst8L291SwvT3GfH0X8oi6rlZXRRtgaAQX3oOw
+
+{
+    "nombre": "Fulano",
+    "apellido": "de Tal",
+    "nacionalidad": "MXN",
+    "fecha_nacimiento": "1990-01-01"
+}
+
+### Crear una editorial
+POST http://localhost:3000/libros/editorial
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzUwMDAzLCJleHAiOjE3NDQ3NTE4MDN9.T8Ooinst8L291SwvT3GfH0X8oi6rlZXRRtgaAQX3oOw
+
+{
+    "nombre": "HarperCollins",
+    "pais": "Reino Unido"
+}

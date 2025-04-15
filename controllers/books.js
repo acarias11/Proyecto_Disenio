@@ -1,4 +1,6 @@
-import { validateBook, validateBookPartial } from "../schemas/schema.js"
+import { validateBook, validateBookPartial } from "../schemas/book.js"
+import { validateAuthor } from "../schemas/author.js"
+import { validateEditorial } from "../schemas/editorial.js"
 import { errorResponse, successResponse } from "../utils/response.js"
 import * as BookModel from "../models/books.js"
 
@@ -21,8 +23,8 @@ export default class BookController {
 
             successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
         } catch (err){
-            // errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
-            console.error(err)
+            // return errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
+            console.error(`Error al obtener datos de los libros ${err}`)
         }
     }
 
@@ -35,12 +37,12 @@ export default class BookController {
             const result = await BookModel.getBookById(id, usuarioEmail)
 
             if (!result) {
-                errorResponse(res, 404, 'Libro no encontrado')
+                return errorResponse(res, 404, 'Libro no encontrado')
                             }
             successResponse(res, 200, result, 'Libro obtenido correctamente')
         } catch(err) {
-            // errorResponse(res, 500, 'Error al obtener el libro', err.message)
-            console.error(err)
+            // return errorResponse(res, 500, 'Error al obtener el libro', err.message)
+            console.error(`Error al obtener el libro ${err}`)
         }
     }
 
@@ -51,7 +53,7 @@ export default class BookController {
         const usuarioEmail = req.params.email;
 
         if (!validation.success) {
-            errorResponse(res, 400, 'Datos del libro inválidos', 
+            return errorResponse(res, 400, 'Datos del libro inválidos', 
                 `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
             )
         }
@@ -60,8 +62,8 @@ export default class BookController {
             const result = await BookModel.createBook(data, usuarioEmail)
             successResponse(res, 201, result, 'Libro creado exitosamente');
         } catch (err) {
-            // errorResponse(res, 500, 'Error al crear libro', err.message);
-            console.error(err)
+            // return errorResponse(res, 500, 'Error al crear libro', err.message);
+            console.error(`Error al crear libro ${err}`)
         }
     }
 
@@ -72,14 +74,14 @@ export default class BookController {
         const usuarioEmail = req.params.email;
 
         if (!estado || !['Disponible', 'Prestado'].includes(estado)) {
-            errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
+            return errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
         }
 
         try {
             const result = await BookModel.updateBookState(id, estado, usuarioEmail, solicitudId);
             
             if (!result.success) {
-                errorResponse(res, 404, result.message);
+                return errorResponse(res, 404, result.message);
             }
             
             // Personalizar el mensaje según si se eliminó una solicitud
@@ -91,8 +93,8 @@ export default class BookController {
             successResponse(res, 200, result.libro, mensaje);
         }
         catch(err){
-            // errorResponse(res, 500, 'Error al actualizar el estado del libro', err.message);
-            console.error(err)
+            // return errorResponse(res, 500, 'Error al actualizar el estado del libro', err.message);
+            console.error(`Error al actualizar el estado del libro ${err}`)
         }
     }
 
@@ -105,17 +107,17 @@ export default class BookController {
         const validation = validateBookPartial(data)
         
         if (!validation.success) {
-            errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
+            return errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
         }
 
         try {
             const result = await BookModel.updateBook(id, data, usuarioEmail)
             if (!result) {
-                errorResponse(res, 404, 'Libro no encontrado')
+                return errorResponse(res, 404, 'Libro no encontrado')
             }
             successResponse(res, 200, result, 'Libro actualizado correctamente')
         } catch(error){
-            console.error(error)
+            console.error(`Error al actualizar libro ${error}`)
         }
     }
 
@@ -128,12 +130,12 @@ export default class BookController {
             const result = await BookModel.deleteBook(id, usuarioEmail)
             
             if (!result) {
-                errorResponse(res, 404, 'Libro no encontrado')
+                return errorResponse(res, 404, 'Libro no encontrado')
             }
             
             successResponse(res, 200, null, 'Libro eliminado correctamente')
         } catch (err) {
-            console.error(err)
+            console.error(`Error al eliminar libro ${err}`)
         }
     }
 
@@ -142,19 +144,19 @@ export default class BookController {
         const { usuarioEmail } = req.body;
 
         if (!usuarioEmail) {
-            errorResponse(res, 400, 'ID de usuario requerido');
+            return errorResponse(res, 400, 'ID de usuario requerido');
         }
 
         try {
             const result = await BookModel.requestBook(id, usuarioEmail);
             
             if (!result.success) {
-                errorResponse(res, 404, result.message);
+                return errorResponse(res, 404, result.message);
             }
             
             successResponse(res, 200, result, 'Solicitud de libro registrada correctamente');
         } catch (err) {
-            console.error(err);
+            console.error(`Error al solicitar libro ${err}`);
         }
     }
 
@@ -163,8 +165,58 @@ export default class BookController {
             const solicitudes = await BookModel.getAllSolicitudes();
             successResponse(res, 200, solicitudes, 'Solicitudes obtenidas correctamente');
         } catch (err) {
-            // errorResponse(res, 500, 'Error al obtener las solicitudes', err.message);
-            console.error(err);
+            // return errorResponse(res, 500, 'Error al obtener las solicitudes', err.message);
+            console.error(`Error al obtener las solicitudes ${err}`);
         }
     }
+
+    static createAuthor = async (req, res) => {
+        const authorData = req.body
+        
+        try {
+            const author = validateAuthor(authorData)
+            const usuarioEmail = req.params.email
+
+            if (!author.success) {
+                return errorResponse(res, 400, 'Datos del autor inválidos',
+                     `${author.error.errors[0].path}: ${author.error.errors[0].message}`)
+            }
+
+            const result = await BookModel.createAuthor(authorData, usuarioEmail)
+
+            successResponse(res, 201, null, 'Autor creado exitosamente')
+        } catch (error) {
+            console.log(`Error al crear autor ${error}`)
+        }
+        
+    }
+
+    static createEditorial = async (req, res) => {
+        const editorialData = req.body
+        const usuarioEmail = req.params.email
+        
+        try {
+            const editorial = validateEditorial(editorialData)
+
+            if (!editorial.success) {
+                return errorResponse(res, 400, 'Datos de la editorial inválidos',
+                     `${editorial.error.errors[0].path}: ${editorial.error.errors[0].message}`)
+            }
+
+            const editorialExists = await BookModel.editorialExists(editorialData)
+
+            if (editorialExists) {
+                return errorResponse(res, 400, 'La editorial ya existe')
+            }
+
+            const result = await BookModel.createEditorial(editorialData, usuarioEmail)
+
+            successResponse(res, 201, null, 'Editorial creada exitosamente')
+        } catch (error) {
+            console.log(`Error al crear editorial ${error}`)
+        }
+        
+    }
+
+        
 }

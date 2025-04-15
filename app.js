@@ -18,7 +18,7 @@ app.disable('x-powered-by');
 // Middlewares
 // Configuración de CORS
 app.use(cors({
-    origin: ['http://localhost:3000'], // Origen permitido
+    origin: '*', // Origen permitido
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'] // Encabezados permitidos
 }));

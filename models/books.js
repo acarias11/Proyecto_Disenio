@@ -1,5 +1,6 @@
 import sql from 'mssql';
 import db from '../config/database.js';
+import { authorSchema } from '../schemas/author.js';
 
 
 // Función para registrar en bitácora mejorada
@@ -578,6 +579,7 @@ export async function getAllSolicitudes() {
         return solicitudes;
 }
 
+// Función para eliminar un libro
 export async function deleteBook(id, usuarioEmail) {
 
     const pool = await db.connect();
@@ -595,31 +597,116 @@ export async function deleteBook(id, usuarioEmail) {
         return false;
     }
     
+    
+    const pool2 = await db.connect();
+
+    const request2 = pool2.request()
+    
+    request2.input('id', sql.UniqueIdentifier, id);
+    
+    const query = `
+    DELETE FROM Edicion
+    WHERE LibroID = @id;
+    DELETE FROM LibroDetalle
+    WHERE LibroID = @id;
+    DELETE FROM GeneroLibro
+    WHERE LibroID = @id;
+    DELETE FROM Solicitud
+    WHERE LibroID = @id;
+    DELETE FROM Libro
+    WHERE LibroID = @id;
+    `;
+    
+    const result2 = await request2.query(query);
+    
     // Registrar en bitácora
     if (usuarioEmail) {
         await registrarEnBitácora(usuarioEmail, `Se ha eliminado el libro con id: ${result.recordset[0].LibroID}`);
     }
 
-    const pool2 = await db.connect();
-
-    const request2 = pool2.request()
-
-    request2.input('id', sql.UniqueIdentifier, id);
-
-    const query = `
-        DELETE FROM Edicion
-        WHERE LibroID = @id;
-        DELETE FROM LibroDetalle
-        WHERE LibroID = @id;
-        DELETE FROM GeneroLibro
-        WHERE LibroID = @id;
-        DELETE FROM Solicitud
-        WHERE LibroID = @id;
-        DELETE FROM Libro
-        WHERE LibroID = @id;
-    `;
-
-    const result2 = await request2.query(query);
-
     return true;
 }
+
+// Funcion para crear un autor
+export async function createAuthor(author, usuarioEmail){
+
+    const pool = await db.connect()
+
+    const request = pool.request()
+
+    request.input('nombre', sql.NVarChar, author.nombre)
+    request.input('apellido', sql.NVarChar, author.apellido)
+    request.input('nacionalidad', sql.VarChar(3), author.nacionalidad)
+    request.input('fecha_nacimiento', sql.Date, author.fecha_nacimiento)
+    
+    const query = `
+    INSERT INTO Autor (Nombre, Apellido, fecha_nacimiento, Nacionalidad)
+    VALUES (@nombre, @apellido, @fecha_nacimiento, @nacionalidad)
+    `
+    const result = await request.query(query)
+
+    // Registrar en bitácora
+    await registrarEnBitácora(usuarioEmail, `Se ha creado el autor: ${author.nombre} ${author.apellido}`);
+    
+    return true
+}
+
+// Función para crear una editorial
+export async function createEditorial(editorialData, usuarioEmail){
+
+    const pool = await db.connect()
+
+    const request = pool.request()
+
+    request.input('nombre', sql.NVarChar, editorialData.nombre)
+    request.input('pais', sql.NVarChar, editorialData.pais)
+
+    const query = `
+    INSERT INTO Editorial (Nombre, Pais)
+    VALUES (@nombre, @pais)
+    `
+
+    const result = await request.query(query)
+
+    // Registrar en bitácora
+    await registrarEnBitácora(usuarioEmail, `Se ha creado la editorial: ${editorialData.nombre}`);
+
+    return true
+}
+
+// Funcion para verificar si el autor existe
+// export async function authorExists(authorName) {
+//     const pool = await db.connect()
+
+//     const request = pool.request()
+
+//     const [nombre, apellido] = authorName.split(' ')
+
+//     request.input('nombre', sql.NVarChar, nombre)
+//     request.input('apellido', sql.NVarChar, apellido)
+
+//     const query = `
+//     SELECT AutorID FROM Autor WHERE Nombre LIKE '%@nombre%' AND Apellido LIKE %@Apellido%`
+
+//     const result = await request.query(query)
+
+//     return result.recordset[0]
+// }
+
+// Funcion para verificar si la editorial existe
+export async function editorialExists(editorial) {
+    const pool = await db.connect()
+
+    const request = pool.request()
+
+    request.input('nombre', sql.NVarChar, editorial.nombre)
+    request.input('pais', sql.NVarChar, editorial.pais)
+
+    const query = `
+    SELECT EditorialID FROM Editorial WHERE Nombre LIKE '%@nombre%' AND Pais LIKE '%@pais%'`
+
+    const result = await request.query(query)
+
+    return true
+}
+    

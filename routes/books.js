@@ -23,4 +23,10 @@ booksRoutes.get('/solicitudes/all', [ isAuth, isAdmin ], BookController.getAllSo
 // Solicitar un libro (cualquier usuario autenticado)
 booksRoutes.post('/:id/solicitar', isAuth, BookController.requestBook);
 
+// Publicar un author (Solo administradores)
+booksRoutes.post('/author', [ isAuth, isAdmin ], BookController.createAuthor);
+
+// Publicar una editorial (Solo administradores)
+booksRoutes.post('/editorial', [ isAuth, isAdmin ], BookController.createEditorial);
+
 export default booksRoutes;

@@ -12,7 +12,7 @@ export default class LogsController {
             const result = await LogsModel.getAllLogs(userEmail);
 
             if (!result) {
-                errorResponse(res, 404, 'No se encontraron eventos de la bitácora');
+                return errorResponse(res, 404, 'No se encontraron eventos de la bitácora');
             }
 
             successResponse(res, 200, result, 'Eventos de la bitácora obtenidos correctamente');
@@ -32,13 +32,13 @@ export default class LogsController {
             const userData = await verifyUser({ id });
 
             if (!userData) {
-                errorResponse(res, 400, 'El usuario no existe');
+                return errorResponse(res, 400, 'El usuario no existe');
             }
 
             const result = await LogsModel.getLogByUserId(id, userEmail);
             
             if (!result) {
-                errorResponse(res, 404, 'No se encontraron eventos de la bitácora para el usuario');
+                return errorResponse(res, 404, 'No se encontraron eventos de la bitácora para el usuario');
             }
 
             successResponse(res, 200, result, 'Eventos de la bitácora obtenidos correctamente');

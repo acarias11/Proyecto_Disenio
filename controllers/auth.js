@@ -1,25 +1,25 @@
 import jsonwebtoken from 'jsonwebtoken';
 import { errorResponse, successResponse } from '../utils/response.js';
 import * as AuthModel from '../models/auth.js';
-import { validateUser, validateUserPartial } from '../schemas/schema.js';
+import { validateUser, validateUserPartial } from '../schemas/user.js';
 
 export default class AuthController {
     static login = async (req, res) => {
         const { email, password } = req.body;
 
         if(!email || !password){
-            errorResponse(res, 400, 'Los datos ingresados son inválidos');
+            return errorResponse(res, 400, 'Los datos ingresados son inválidos');
         }
 
         try {
             const userData = await AuthModel.verifyUser({ email });
             if(!userData){
-                errorResponse(res, 400, 'El email no está registrado');
+                return errorResponse(res, 400, 'El email no está registrado');
             }
 
             // Verificar si el usuario está verificado
             if (!userData.Verificado) {
-                errorResponse(res, 400, 'El usuario no está verificado');
+                return errorResponse(res, 400, 'El usuario no está verificado');
             }
             
             // Procesar la contraseña almacenada1.
@@ -41,7 +41,7 @@ export default class AuthController {
 
             // Comparar sin distinción de mayúsculas/minúsculas
             if (storedPassword.toLowerCase() !== password.toLowerCase()) {
-                errorResponse(res, 400, 'La contraseña es incorrecta');
+                return errorResponse(res, 400, 'La contraseña es incorrecta');
             }
 
             const token = jsonwebtoken.sign({
@@ -71,7 +71,7 @@ export default class AuthController {
             const validation = validateUserPartial(userData);
 
             if (!validation.success) {
-                errorResponse(res, 400, 'Datos inválidos', 
+                return errorResponse(res, 400, 'Datos inválidos', 
                     `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
                 );
             }
@@ -81,7 +81,7 @@ export default class AuthController {
             const existingUser = await AuthModel.verifyUser({ email });
 
             if (existingUser) {
-                errorResponse(res, 400, 'El email ya está registrado');
+                return errorResponse(res, 400, 'El email ya está registrado');
             }
 
             const newUser = await AuthModel.createUser(userData);
@@ -110,7 +110,7 @@ export default class AuthController {
             
             const validation = validateUser(userData)
             if (!validation.success) {
-                errorResponse(res, 400, 'Datos inválidos', 
+                return errorResponse(res, 400, 'Datos inválidos', 
                     `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`);
             }
 
@@ -118,7 +118,7 @@ export default class AuthController {
 
             const existingUser = await AuthModel.verifyUser({ email })
             if (existingUser) {
-                errorResponse(res, 400, 'El email ya está registrado');
+                return errorResponse(res, 400, 'El email ya está registrado');
             }
 
             await AuthModel.createUser(userData);
