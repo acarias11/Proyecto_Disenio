@@ -579,3 +579,46 @@ export async function getAllSolicitudes() {
         return solicitudes;
 }
 
+export async function deleteBook(id, usuarioEmail) {
+
+    const pool = await db.connect();
+
+    const request = pool.request()
+
+    request.input('id', sql.UniqueIdentifier, id);
+    
+    const result = await request.query(`
+        SELECT LibroID FROM Libro WHERE LibroID = @id
+        `)
+
+    // Verificar si el libro existe
+    if (result.recordset.length === 0) {
+        return false;
+    }
+    
+    // Registrar en bitácora
+    if (usuarioEmail) {
+        await registrarEnBitácora(usuarioEmail, `Se ha eliminado el libro con id: ${result.recordset[0].LibroID}`);
+    }
+
+    const pool2 = await db.connect();
+
+    const request2 = pool2.request()
+
+    request2.input('id', sql.UniqueIdentifier, id);
+
+    const query = `
+        DELETE FROM Edicion
+        WHERE LibroID = @id;
+        DELETE FROM LibroDetalle
+        WHERE LibroID = @id;
+        DELETE FROM GeneroLibro
+        WHERE LibroID = @id;
+        DELETE FROM Libro
+        WHERE LibroID = @id;
+    `;
+
+    const result2 = await request2.query(query);
+
+    return true;
+}

@@ -126,9 +126,11 @@ export default class BookController {
 
         try {
             const result = await BookModel.deleteBook(id, usuarioEmail)
+            
             if (!result) {
                 errorResponse(res, 404, 'Libro no encontrado')
             }
+            
             successResponse(res, 200, null, 'Libro eliminado correctamente')
         } catch (err) {
             console.error(err)
