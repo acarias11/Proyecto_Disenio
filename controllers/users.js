@@ -6,6 +6,10 @@ export default class UserController {
     try {
         const users = await UserModel.getAllUsersDB();
 
+        if (!users) {
+            errorResponse(res, 404, 'No se encontraron usuarios');
+        }
+
         successResponse(res, 200, users, 'Usuarios obtenidos correctamente');
         
     } catch (error) {

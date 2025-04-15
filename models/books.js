@@ -1,6 +1,5 @@
 import sql from 'mssql';
 import db from '../config/database.js';
-import { nullable } from 'zod';
 
 
 // Función para registrar en bitácora mejorada
@@ -613,6 +612,8 @@ export async function deleteBook(id, usuarioEmail) {
         DELETE FROM LibroDetalle
         WHERE LibroID = @id;
         DELETE FROM GeneroLibro
+        WHERE LibroID = @id;
+        DELETE FROM Solicitud
         WHERE LibroID = @id;
         DELETE FROM Libro
         WHERE LibroID = @id;

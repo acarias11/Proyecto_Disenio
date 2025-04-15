@@ -12,7 +12,7 @@ export default class AuthController {
         }
 
         try {
-            const userData = await AuthModel.verifyUser(email);
+            const userData = await AuthModel.verifyUser({ email });
             if(!userData){
                 errorResponse(res, 400, 'El email no está registrado');
             }
@@ -76,7 +76,9 @@ export default class AuthController {
                 );
             }
 
-            const existingUser = await AuthModel.verifyUser(userData.email);
+            const email = userData.email;
+
+            const existingUser = await AuthModel.verifyUser({ email });
 
             if (existingUser) {
                 errorResponse(res, 400, 'El email ya está registrado');
@@ -112,7 +114,9 @@ export default class AuthController {
                     `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`);
             }
 
-            const existingUser = await AuthModel.verifyUser(userData.email)
+            const email = userData.email
+
+            const existingUser = await AuthModel.verifyUser(email)
             if (existingUser) {
                 errorResponse(res, 400, 'El email ya está registrado');
             }

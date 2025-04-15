@@ -49,20 +49,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjU3ODgwLCJleHAiOjE3NDQ2NTk2ODB9.zP8L4-FXNdkgQ3VujLVxJI8pSCwIa_ddz7WofGuqDrM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
 
 ### GET PARA LIBROS con filtros
 GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjYzNzY3LCJleHAiOjE3NDQ2NjU1Njd9.Mv-OR7kYSXeGDIWgJYzkWf9mXT5WMIvvyGbIftUmuTA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjY0NTk1LCJleHAiOjE3NDQ2NjYzOTV9.gPZGeOrq7a8fmnE-ivYZ2TEK92yDYkYuWpDEMZ4vRpE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
 
 
 ### GET UN LIBRO POR ID 
 GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjY0NTk1LCJleHAiOjE3NDQ2NjYzOTV9.gPZGeOrq7a8fmnE-ivYZ2TEK92yDYkYuWpDEMZ4vRpE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
 
 ### CREAR UN NUEVO LIBRO
 POST http://localhost:3000/libros
@@ -108,3 +108,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
     "estado": "Disponible",
     "solicitudId": 2
 }
+
+### Ver historial de eventos (solo admins)
+GET http://localhost:3000/logs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+
+### Ver historial de eventos de un usuario (solo admins)
+GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik

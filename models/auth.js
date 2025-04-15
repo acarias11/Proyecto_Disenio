@@ -3,12 +3,26 @@ import sql from 'mssql'
 import { registrarEnBitácora } from './books.js';
 
 // Funcion para verificar si el usuario existe
-export const verifyUser = async (email) => {
+export const verifyUser = async ({email = null, id = null}) => {
     const pool = await db.connect() 
 
         const request = pool.request();
         
-        request.input('email', sql.NVarChar, email);
+        let buscar = []
+
+        if (email){
+            request.input('email', sql.NVarChar, email);
+            buscar.push('Email = @email')
+        }
+        
+        if (id){
+            request.input('usuarioID', sql.UniqueIdentifier, id);
+            buscar.push('CONVERT(UNIQUEIDENTIFIER, UsuarioID) = @usuarioID')
+        }
+
+        let condicion = ''
+
+        if (buscar.length > 0) condicion += buscar.join(' OR ');
         
         const result = await request.query(`
             SELECT UsuarioID, 
@@ -16,8 +30,8 @@ export const verifyUser = async (email) => {
                 Password,
                 Rol,
                 Verificado 
-                FROM USUARIOS 
-                WHERE Email = @email
+                FROM USUARIOS
+                WHERE ${condicion}
         `);
         
         return result.recordset[0];
