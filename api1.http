@@ -1,0 +1,73 @@
+### Pruebas de API para la autenticación y verificación de usuarios
+
+### Login admin (Obtener token nuevo)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "AnaMartinez@gmail.com",
+    "password": "anamart123"
+}
+
+### Login usuario corriente (Verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "jhernandez19@outlook.com",
+    "password": "jhndez1234"
+}
+
+### Login usuario corriente (No verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "LuisGomez@gmail.com",
+    "password": "Lg0m3z"
+}
+
+### Verificar usuario
+POST http://localhost:3000/users/verificar
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+
+{
+    "id": "4641941C-11C0-415A-9671-A13A4FF36FD2"
+}
+
+### Login usuario corriente (No verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "errbaraho2@gmail.com",
+    "password": "EnrriqBarr@123"
+}
+
+### Registrar un nuevo usuario 
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+    "nombre": "Melisa Gonzalez",
+    "email": "melissgonz123@hotmail.com",
+    "password": "MelisaGonzalez123"
+}
+
+### Registrar un nuevo usuario (con rol admin)
+POST http://localhost:3000/registerAdmin
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+
+{
+    "nombre": "Alejandro Perez",
+    "email": "alejoppp1212@hotmail.com",
+    "password": "Alejoperez123",
+    "rol": "Admin",
+    "verificado": 1
+}
+
+### Obtener IDs de usuarios (para usar en solicitudes)
+GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc

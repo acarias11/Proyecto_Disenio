@@ -68,7 +68,7 @@ export default class BookController {
     }
 
 
-    static update = async (req, res, next) => {
+    static updatePartial = async (req, res, next) => {
 
         // Verificar que la ruta no sea '/estado'
         // Esto es para evitar que la ruta '/estado' sea manejada por este método
@@ -88,7 +88,7 @@ export default class BookController {
             })
         }
 
-            const result = await BookModel.updateBook(id, data, usuarioEmail)
+            const result = await BookModel.updateBookPartial(id, data, usuarioEmail)
             
             if (result.success === false) {
                 return errorResponse(res, 404, result.message)
@@ -122,7 +122,7 @@ export default class BookController {
     }
 
     static requestBook = async (req, res) => {
-        const id = req.params.id; // ID del libro
+        const { id } = req.body; // ID del libro
         
         // Obtener email del usuario autenticado (del token JWT)
         // Nota: Debe ser req.user.email, no req.params.email (a menos que tu middleware lo configure así)
@@ -134,7 +134,7 @@ export default class BookController {
 
         try {
             // Ya no necesitamos enviar nombreUsuario, usamos el email del token
-            const result = await BookModel.requestBook(id, usuarioEmail);
+            const result = await BookModel.request(id, usuarioEmail);
             
             if (!result.success) {
                 return errorResponse(res, 404, result.message);
@@ -189,7 +189,7 @@ export default class BookController {
                      `${editorial.error.errors[0].path}: ${editorial.error.errors[0].message}`)
             }
 
-            const editorialExists = await BookModel.editorialExists(editorialData)
+            const editorialExists = await BookModel.editorialExists(editorialData.nombre)
 
             if (editorialExists) {
                 return errorResponse(res, 400, 'La editorial ya existe')
@@ -234,6 +234,66 @@ export default class BookController {
             console.error('Error en updateState:', error);
             // errorResponse(res, 500, 'Error interno del servidor', error.message)
         }
+    }
+
+    static updateComplete = async (req, res) => {
+        
+        // Obtener el id del libro
+        const id = req.params.id
+
+        const libro = req.body
+        
+        // Obtener el email del usuario desde el token
+        const usuarioEmail = req.params.email;
+    
+        try {
+
+            // Validar que el libro exista
+            const libroExistente = await BookModel.getBookById(id)  
+            
+            if (!libroExistente) {
+                return errorResponse(res, 404, 'El Libro ingresado no existe');
+            }
+
+            // Agregar el mismo estado que en la BD a la nueva información del libro
+            libro.libroId = libroExistente.LibroID
+            libro.estado = libroExistente.Estado
+
+            // Validar que la información recibida sea correcta
+            const validation = validateBook(libro);
+
+            if (!validation.success){
+                return errorResponse(res, 400, 'Los Datos ingresados no son válidos', {
+                    message: `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
+                })
+            }
+
+            // Verificar que el autor y la editorial existan
+            const autorExistente = await BookModel.authorExists(libro.autor)
+
+            if (!autorExistente) {
+                return errorResponse(res, 404, 'El Autor ingresado no existe en la BD')
+            }
+
+            libro.autorId = autorExistente.AutorID
+
+            const editorialExistente = await BookModel.editorialExists(libro.editorial)
+
+            if (!editorialExistente) {
+                return errorResponse(res, 404, 'La Editorial ingresada no existe en la BD')
+            }
+
+            libro.editorialId = editorialExistente.EditorialID
+
+            // Actualizar el libro en la base de datos
+            const result = await BookModel.updateBookComplete(libro, usuarioEmail)
+            
+            successResponse(res, 204, null, 'Libro actualizado correctamente')
+
+        } catch (error) {
+            console.error(`Error al actualizar libro: ${error}`)
+        }
+        
     }
         
 }

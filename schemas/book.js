@@ -50,12 +50,12 @@ export const bookSchema = z.object({
         message: "El rating debe ser mayor o igual a 0."
     }).lte(5, {
         message: "El rating debe ser menor o igual a 5."
-    }).optional()
-    // ,"generos": z.array(z.string(), {
-    //     required_error: "Los géneros son obligatorios."
-    // }).min(1, {
-    //     message: "Debes seleccionar al menos un género."
-    // })
+    }).optional(),
+    "generos": z.array(z.string(), {
+        // required_error: "Los géneros son obligatorios."
+    }).min(1, {
+        message: "Debes seleccionar al menos un género."
+    }).optional() // Quitar opcional para que sea obligatorio
 });
 
 

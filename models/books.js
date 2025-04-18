@@ -136,12 +136,31 @@ export async function getAllBooks(usuarioEmail, { genre = null, author = null, e
         ${condicion}`;
 
         const result = await request.query(query);
+
+        // Agregar generos a los libros
+        const result2 = pool.request()
+
+        for (let i = 0; i < result.recordset.length; i++) {
+            const libroId = result.recordset[i].LibroID;
+            const generoQuery = `SELECT G.Nombre FROM GeneroLibro AS GL
+            INNER JOIN Genero AS G ON GL.GeneroID = G.GeneroID
+            WHERE GL.LibroID = @libroId${i}`;
+            
+            result2.input(`libroId${i}`, sql.UniqueIdentifier, libroId);
+            
+            const generoResult = await result2.query(generoQuery);
+            
+            const generos = generoResult.recordset.map(row => row.Nombre).join(', ');
+            
+            result.recordset[i].Generos = generos;
+        }
+
         
         // Intentar registrar en bitácora, pero capturar errores para que no interrumpan
         if (usuarioEmail) {
             await registrarEnBitácora(usuarioEmail, 'Consulta de los libros');
         }
-            
+
         return result.recordset;
 }
 
@@ -181,6 +200,22 @@ export async function getBookById(id, usuarioEmail) {
             return null;
         }
         
+        // Agregar generos al libro
+        const result2 = pool.request()
+
+        const libroId = result.recordset[0].LibroID;
+        const generoQuery = `SELECT G.Nombre FROM GeneroLibro AS GL
+        INNER JOIN Genero AS G ON GL.GeneroID = G.GeneroID
+        WHERE GL.LibroID = @libroId`;
+        
+        result2.input(`libroId`, sql.UniqueIdentifier, libroId);
+            
+        const generoResult = await result2.query(generoQuery);
+            
+        const generos = generoResult.recordset.map(row => row.Nombre).join(', ');
+            
+        result.recordset[0].Generos = generos;
+
         // Registrar en bitácora
         if (usuarioEmail) {
             await registrarEnBitácora(usuarioEmail, `Consulta del libro: ${result.recordset[0].Nombre}`);
@@ -358,7 +393,7 @@ export async function createBook(bookData, usuarioEmail) {
 }
 
 //Ruta para editar libros especificos 
-export async function updateBook (id, bookData, usuarioEmail) {
+export async function updateBookPartial (id, bookData, usuarioEmail) {
     try {
         const pool = await db.connect();
         const transaction = new sql.Transaction(db);
@@ -442,8 +477,8 @@ export async function updateBook (id, bookData, usuarioEmail) {
     }
 }
 
-// Modificar requestBook para aceptar nombreUsuario en lugar de ID
-export async function requestBook(id, usuarioEmail) {
+// Modificar request para aceptar nombreUsuario en lugar de ID
+export async function request(id, usuarioEmail) {
     try {
         console.log(`Procesando solicitud: Libro ${id}, Usuario por email ${usuarioEmail}`);
         const pool = await db.connect();
@@ -692,23 +727,27 @@ export async function createEditorial(editorialData, usuarioEmail){
 }
 
 // Funcion para verificar si el autor existe
-// export async function authorExists(authorName) {
-//     const pool = await db.connect()
+export async function authorExists(authorName) {
+    const pool = await db.connect()
 
-//     const request = pool.request()
+    const request = pool.request()
 
-//     const [nombre, apellido] = authorName.split(' ')
+    let [nombre, ...apellido] = authorName.split(' ')
 
-//     request.input('nombre', sql.NVarChar, nombre)
-//     request.input('apellido', sql.NVarChar, apellido)
+    if (typeof apellido !== 'string') {
+        apellido = apellido.join(' ')   
+    }
 
-//     const query = `
-//     SELECT AutorID FROM Autor WHERE Nombre LIKE '%@nombre%' AND Apellido LIKE %@Apellido%`
+    request.input('nombre', sql.NVarChar, nombre)
+    request.input('apellido', sql.NVarChar, apellido)
 
-//     const result = await request.query(query)
+    const query = `
+    SELECT AutorID FROM Autor WHERE Nombre LIKE @nombre AND Apellido LIKE @apellido`
 
-//     return result.recordset[0]
-// }
+    const result = await request.query(query)
+
+    return result.recordset[0]
+}
 
 // Funcion para verificar si la editorial existe
 export async function editorialExists(editorial) {
@@ -716,15 +755,14 @@ export async function editorialExists(editorial) {
 
     const request = pool.request()
 
-    request.input('nombre', sql.NVarChar, editorial.nombre)
-    request.input('pais', sql.NVarChar, editorial.pais)
+    request.input('nombre', sql.NVarChar, editorial)
 
     const query = `
-    SELECT EditorialID FROM Editorial WHERE Nombre LIKE '%@nombre%' AND Pais LIKE '%@pais%'`
+    SELECT EditorialID FROM Editorial WHERE Nombre LIKE @nombre`
 
     const result = await request.query(query)
 
-    return true
+    return result.recordset[0]
 }
 
 // Nueva función completamente independiente
@@ -837,5 +875,58 @@ export async function updateBookState(solicitudId, estado, usuarioEmail, libroID
             estadoAnterior: libroInfo.Estado,
             nuevoEstado: estado
         } };
+}
 
+export async function updateBookComplete(libro, usuarioEmail){
+
+    const pool = await db.connect();
+
+    const request = pool.request()
+
+    request.input('libroId', sql.UniqueIdentifier, libro.libroId)
+    request.input('nombre', sql.NVarChar, libro.nombre)
+    request.input('autorId', sql.Int, libro.autorId)
+    request.input('editorialId', sql.Int, libro.editorialId)
+    request.input('rating', sql.Numeric(3, 2), libro.rating)
+    request.input('descripcion', sql.NVarChar, libro.descripcion)
+    request.input('fecha_publicacion', sql.Date, libro.fecha_publicacion)
+    request.input('paginas', sql.Int, libro.paginas)
+    request.input('idioma', sql.NVarChar, libro.idioma)
+
+    const query = `
+    UPDATE Libro SET Nombre = @nombre, AutorID = @autorId, EditorialID = @editorialId, Rating = @rating WHERE LibroID = @libroId;
+    UPDATE Edicion SET Paginas = @paginas, Idioma = @idioma WHERE LibroID = @libroId;
+    UPDATE LibroDetalle SET Descripcion = @descripcion, fecha_publicacion = @fecha_publicacion WHERE LibroID = @libroId;`
+
+    const result = await request.query(query);
+
+    const deleteGenerosQuery = `DELETE FROM GeneroLibro WHERE LibroID = @libroId`;
+    
+    // Eliminar generos antiguos
+    await pool.request().input('libroId', sql.UniqueIdentifier, libro.libroId).query(deleteGenerosQuery);
+    
+    // Actualizar generos
+    const generos = libro.generos;
+
+    const request2 = pool.request();
+
+    request2.input('libroId', sql.UniqueIdentifier, libro.libroId);
+    
+    for (let i = 0; i < generos.length; i++) {
+        
+        const genero = generos[i];
+        request2.input(`genero${i}`, sql.NVarChar, genero);
+
+        const insertGeneroQuery = `
+            INSERT INTO GeneroLibro (LibroID, GeneroID)
+            VALUES (@libroId, (SELECT GeneroID FROM Genero WHERE Nombre = @genero${i}))
+        `;
+
+        await request2.query(insertGeneroQuery); 
+    }
+    
+    // Registrar en bitácora
+    await registrarEnBitácora(usuarioEmail, `Actualización completa del libro: ${libro.nombre}`);
+
+    return true
 }
