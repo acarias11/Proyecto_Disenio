@@ -7,16 +7,7 @@ Content-Type: application/json
     "password": "anamart123"
 }
 
-### Login usuario corriente (Obtener token nuevo)
-POST http://localhost:3000/login
-Content-Type: application/json
-
-{
-    "email": "LuisGomez@gmail.com",
-    "password": "Lg0m3z"
-}
-
-### Login usuario corriente (No verificado)
+### Login usuario corriente (Verificado)
 POST http://localhost:3000/login
 Content-Type: application/json
 
@@ -25,13 +16,22 @@ Content-Type: application/json
     "password": "jhndez1234"
 }
 
+### Login usuario corriente (No verificado)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "LuisGomez@gmail.com",
+    "password": "Lg0m3z"
+}
+
 ### Verificar usuario
 POST http://localhost:3000/users/verificar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzQwNzM5LCJleHAiOjE3NDQ3NDI1Mzl9.TS9kt8gqRzaKKu687xxpL_etUTVPpHk86AmsPO9Z1L4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
-    "id": "A9386387-73A4-4C94-BA8D-3B2F7DE452C4"
+    "id": "4641941C-11C0-415A-9671-A13A4FF36FD2"
 }
 
 ### Login usuario corriente (No verificado)
@@ -42,48 +42,50 @@ Content-Type: application/json
     "email": "errbaraho2@gmail.com",
     "password": "EnrriqBarr@123"
 }
+
 ### Registrar un nuevo usuario 
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-    "nombre": "Enrique Barahona",
-    "email": "errbaraho2@gmail.com",
-    "password": "EnrriqBarr@123"
+    "nombre": "Melisa Gonzalez",
+    "email": "melissgonz123@hotmail.com",
+    "password": "MelisaGonzalez123"
 }
 
 ### Registrar un nuevo usuario (con rol admin)
 POST http://localhost:3000/registerAdmin
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NTk0NDc5LCJleHAiOjE3NDQ1OTYyNzl9.s7E7oSPKBNJSBV0ZsoLGJTbEnMDH4pv_dkdloAZnLBA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
-    "nombre": "Tulio Gonzalez",
-    "email": "tlgonzalez22@hotmail.com",
-    "password": "TulioGonzalez123",
+    "nombre": "Alejandro Perez",
+    "email": "alejoppp1212@hotmail.com",
+    "password": "Alejoperez123",
     "rol": "Admin",
     "verificado": 1
 }
 
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTI4ODg1LCJleHAiOjE3NDQ5MzA2ODV9.J0hM_LYvD1AVEAuxbQESOw2-iEolhm3tOT8urQwe6ow
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+
 ### GET PARA LIBROS con filtros
 GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTI4ODg1LCJleHAiOjE3NDQ5MzA2ODV9.J0hM_LYvD1AVEAuxbQESOw2-iEolhm3tOT8urQwe6ow
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### GET UN LIBRO POR ID 
 GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### CREAR UN NUEVO LIBRO (EL AUTOR Y LA EDITORIAL DEBEN EXISTIR EN LA BD)
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTA5MDExLCJleHAiOjE3NDQ5MTA4MTF9.DoBZaWoqh86VJJikQErc45b16HC3vh_YE_WUX4Mjtag
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
     "nombre": "Crónica de una muerte anunciada",
@@ -96,10 +98,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
     "descripcion": "Novela corta que relata el asesinato de Santiago Nasar a manos de los hermanos Vicario.",
     "fecha_publicacion": "1981-01-01"
 }
-###Crear otro libro
+
+### Crear otro libro
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTA5MDExLCJleHAiOjE3NDQ5MTA4MTF9.DoBZaWoqh86VJJikQErc45b16HC3vh_YE_WUX4Mjtag
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
     "nombre": "Sofia Sofia",
@@ -112,23 +115,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
     "descripcion": "Novela corta que relata la vida de una mujer en un mundo de hombres.",
     "fecha_publicacion": "2023-01-01"
 }
+
 ### Actualizar un libro (PATCH)
 PATCH http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTExOTI0LCJleHAiOjE3NDQ5MTM3MjR9.k4LH2Vz4vic9XsWOifjr7TUO1FyxRZk9w1eMnjPkmIg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
-    "rating": 5.0
+    "rating": 4.0
 }
 
 ### ELIMINAR UN LIBRO 
-DELETE http://localhost:3000/libros/98a39ec1-5b72-41cb-aa77-9e39932fd207
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTA5MDExLCJleHAiOjE3NDQ5MTA4MTF9.DoBZaWoqh86VJJikQErc45b16HC3vh_YE_WUX4Mjtag
+DELETE http://localhost:3000/libros/62FABF5C-8481-451F-9A72-C0DEF70EADB8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
 POST http://localhost:3000/libros/5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c/solicitar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTE2NjE5LCJleHAiOjE3NDQ5MTg0MTl9.vAP9-vepzsRDdkgG3CfyI8It7Ko8KLhhyvKemtytsbc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
     "usuarioId": "0x1C944146C0115A419671A13A4FF36FD2"
@@ -136,45 +140,44 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### VER TODAS LAS SOLICITUDES (solo admins)(Desoues de realizar la solicitud de un libro, se usa esta ruta para ver las solictudes pendientes)
 GET http://localhost:3000/libros/solicitudes/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTE2NjE5LCJleHAiOjE3NDQ5MTg0MTl9.vAP9-vepzsRDdkgG3CfyI8It7Ko8KLhhyvKemtytsbc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### Actualizar estado de una solicitud (solo admins) (Despues de verificaer la solicitudes pendientes, se usa esta ruta para actualizar el estado del libro
 ###Si en la tabla dice que esta disbonible, se cambia a prestado y viceversa y se pone el id de la solicitud, para eliminarla)
 PATCH http://localhost:3000/libros/estado
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTM1MjI4LCJleHAiOjE3NDQ5MzcwMjh9.0kFFUiWLDerFQuxFjoS5KZCdeCGqiMJwADYZ0J4ITd8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
-    "solicitudId": 5,
+    "solicitudId": 9,
     "estado": "Disponible",
     "libroID": "5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c"
-
 }
 
 ### Ver historial de eventos (solo admins)
 GET http://localhost:3000/logs
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### Ver historial de eventos de un usuario (solo admins)
 GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NjkwODY1LCJleHAiOjE3NDQ2OTI2NjV9.hXZyN4V2PqgvNWc8tmu-33WddwhOZeaQVSmHh5MuHik
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 ### Crear un nuevo autor
 POST http://localhost:3000/libros/author
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzUwMDAzLCJleHAiOjE3NDQ3NTE4MDN9.T8Ooinst8L291SwvT3GfH0X8oi6rlZXRRtgaAQX3oOw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
-    "nombre": "Fulano",
-    "apellido": "de Tal",
-    "nacionalidad": "MXN",
-    "fecha_nacimiento": "1990-01-01"
+    "nombre": "Charles",
+    "apellido": "Bukowski",
+    "nacionalidad": "DEU",
+    "fecha_nacimiento": "1994-03-09"
 }
 
 ### Crear una editorial
 POST http://localhost:3000/libros/editorial
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0NzUwMDAzLCJleHAiOjE3NDQ3NTE4MDN9.T8Ooinst8L291SwvT3GfH0X8oi6rlZXRRtgaAQX3oOw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
 
 {
     "nombre": "HarperCollins",

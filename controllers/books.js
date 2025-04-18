@@ -68,26 +68,38 @@ export default class BookController {
     }
 
 
-    static update = async (req, res) => {
-        const id = req.params.id
+    static update = async (req, res, next) => {
+
+        // Verificar que la ruta no sea '/estado'
+        // Esto es para evitar que la ruta '/estado' sea manejada por este método
+        if (req.path !== '/estado'){
+        
+            const id = req.params.id
         const data = req.body
         // Obtener el email del usuario desde el token
         const usuarioEmail = req.params.email;
         
+        try {
         const validation = validateBookPartial(data)
         
         if (!validation.success) {
-            return errorResponse(res, 400, 'Datos del libro inválidos', validation.error.errors)
+            return errorResponse(res, 400, 'Datos del libro inválidos', {
+                message: `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
+            })
         }
 
-        try {
             const result = await BookModel.updateBook(id, data, usuarioEmail)
-            if (!result) {
-                return errorResponse(res, 404, 'Libro no encontrado')
+            
+            if (result.success === false) {
+                return errorResponse(res, 404, result.message)
             }
-            successResponse(res, 200, result, 'Libro actualizado correctamente')
+
+            successResponse(res, 200, result.libro, 'Libro actualizado correctamente')
         } catch(error){
             console.error(`Error al actualizar libro ${error}`)
+        }
+        } else{
+            next()
         }
     }
 
@@ -103,14 +115,14 @@ export default class BookController {
                 return errorResponse(res, 404, 'Libro no encontrado')
             }
             
-            successResponse(res, 200, null, 'Libro eliminado correctamente')
+            successResponse(res, 204, null, 'Libro eliminado correctamente')
         } catch (err) {
             console.error(`Error al eliminar libro ${err}`)
         }
     }
 
     static requestBook = async (req, res) => {
-        const { id } = req.params;
+        const id = req.params.id;
         const { usuarioId } = req.body;
 
         if (!usuarioId) {
@@ -189,31 +201,34 @@ export default class BookController {
     }
 
     static updateState = async (req, res) => {
-        try {
+            
             const { solicitudId, estado, libroID } = req.body;
-            
-            if (!solicitudId || !estado) {
-                return res.status(400).json({
-                    success: false, 
-                    message: 'Faltan datos requeridos: solicitudId y estado'
-                });
-            }
-            
             // Obtener email del token
             const usuarioEmail = req.params.email;
+        
+        try {
+            // Verificar que el ID de la solicitud y el estado no sean nulos o indefinidos
+            if (!solicitudId || !estado) {
+                return errorResponse(res, 400, 'Faltan datos requeridos: solicitudId y estado')
+            }
             
+            // Validar el ID de la solicitud
+            if (isNaN(solicitudId))  {
+                return errorResponse(res, 400, 'ID de solicitud no válido')
+            }
+
             // Llamar al modelo con el libroID adicional
             const result = await BookModel.updateBookState(solicitudId, estado, usuarioEmail, libroID);
             
-            return res.status(result.success ? 200 : 400).json(result);
-            
+            if (result.success === false) {
+                return errorResponse(res, 404, result.message);
+            }
+
+            successResponse(res, 200, result.data, 'Estado de la solicitud actualizado correctamente');
+
         } catch (error) {
             console.error('Error en updateState:', error);
-            return res.status(500).json({
-                success: false,
-                message: 'Error interno del servidor',
-                error: error.message
-            });
+            // errorResponse(res, 500, 'Error interno del servidor', error.message)
         }
     }
         

@@ -29,7 +29,7 @@ app.use(helmet());
 
 // Registrar rutas
 app.use('/', authRoutes);
-app.use('/libros', booksRoutes);
+app.use('/libros',booksRoutes);
 app.use('/users', userRoutes);
 app.use('/logs', logRoutes);
 
