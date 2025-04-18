@@ -11,11 +11,11 @@ booksRoutes.get('/:id', isAuth, BookController.getById);
 
 // Rutas protegidas para administradores
 booksRoutes.post('/', [ isAuth, isAdmin ], BookController.create);
-booksRoutes.put('/:id', [ isAuth, isAdmin ], BookController.update);
+booksRoutes.patch('/:id', [ isAuth, isAdmin ], BookController.update);
 booksRoutes.delete('/:id', [ isAuth, isAdmin ], BookController.delete);
 
 // Actualizar estado de un libro (corregir la ruta)
-booksRoutes.patch('/estado/:id', [ isAuth, isAdmin ], BookController.updateState);
+booksRoutes.patch('/estado', [ isAuth, isAdmin ], BookController.updateState);
 
 // Nueva ruta para ver solicitudes (solo administradores)
 booksRoutes.get('/solicitudes/all', [ isAuth, isAdmin ], BookController.getAllSolicitudes);

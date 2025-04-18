@@ -3,27 +3,29 @@ import db from '../config/database.js';
 import { authorSchema } from '../schemas/author.js';
 
 
-// Función para registrar en bitácora mejorada
-export async function registrarEnBitácora(usuarioEmail, suceso) {
+// Reemplazar la función registrarEnBitácora actual con esta versión corregida
+export async function registrarEnBitácora(usuarioId, suceso) {
     try {
+        // CORRECCIÓN: Reemplazar la línea problemática con la conexión correcta
         const pool = await db.connect();
-
-        // Si no hay usuarioEmail, no registramos en bitácora
-        if (!usuarioEmail) {
-            console.log('No se registró en bitácora: usuarioEmail no proporcionado');
+        const request = pool.request();
+        
+        // Si no hay usuarioId, no registramos en bitácora
+        if (!usuarioId) {
+            console.log('No se registró en bitácora: usuarioId no proporcionado');
             return;
         }
-        
-        // Si usuarioEmail es un email, buscar el ID real del usuario
-        if (typeof usuarioEmail === 'string' && usuarioEmail.includes('@')) {
+
+        // Si usuarioId es un email, buscar el ID real del usuario
+        if (typeof usuarioId === 'string' && usuarioId.includes('@')) {
             const userQuery = await pool.request()
-            .input('email', sql.NVarChar, usuarioEmail)
-            .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
-            
+                .input('email', sql.NVarChar, usuarioId)
+                .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
+                
             if (userQuery.recordset.length > 0) {
-                usuarioEmail = userQuery.recordset[0].UsuarioID;
+                usuarioId = userQuery.recordset[0].UsuarioID;
             } else {
-                console.log(`No se encontró usuario con email: ${usuarioEmail}`);
+                console.log(`No se encontró usuario con email: ${usuarioId}`);
                 return;
             }
         }
@@ -31,41 +33,39 @@ export async function registrarEnBitácora(usuarioEmail, suceso) {
         // Convertir el ID de usuario al formato binario correcto
         let usuarioIdBinary;
         
-        if (Buffer.isBuffer(usuarioEmail)) {
+        if (Buffer.isBuffer(usuarioId)) {
             // Ya es un Buffer, asegurar que sea de 16 bytes
-            usuarioIdBinary = usuarioEmail.length === 16 ? usuarioEmail : Buffer.alloc(16).fill(usuarioEmail, 0, Math.min(16, usuarioEmail.length));
+            usuarioIdBinary = usuarioId.length === 16 ? usuarioId : Buffer.alloc(16).fill(usuarioId, 0, Math.min(16, usuarioId.length));
         } 
-        else if (typeof usuarioEmail === 'string') {
-            if (usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
+        else if (typeof usuarioId === 'string') {
+            if (usuarioId.match(/^[0-9a-fA-F]+$/)) {
                 // Es hexadecimal, normalizar a 32 caracteres (16 bytes)
-                const normalizedHex = usuarioEmail.padStart(32, '0').substring(0, 32);
+                const normalizedHex = usuarioId.padStart(32, '0').substring(0, 32);
                 usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
             } 
             else {
                 // No es hexadecimal, convertir a buffer de 16 bytes
-                usuarioIdBinary = Buffer.alloc(16).fill(usuarioEmail, 0, Math.min(16, usuarioEmail.length));
+                usuarioIdBinary = Buffer.alloc(16).fill(usuarioId, 0, Math.min(16, usuarioId.length));
             }
         } 
         else {
             // Otro tipo, convertir a string y luego a buffer
-            const strValue = String(usuarioEmail);
+            const strValue = String(usuarioId);
             usuarioIdBinary = Buffer.alloc(16).fill(strValue, 0, Math.min(16, strValue.length));
         }
         
         // Verificar que el buffer sea válido y tenga la longitud correcta
         if (!Buffer.isBuffer(usuarioIdBinary) || usuarioIdBinary.length !== 16) {
-            console.error('Error: Buffer inválido para usuarioEmail:', usuarioIdBinary);
+            console.error('Error: Buffer inválido para usuarioId:', usuarioIdBinary);
             return;
         }
 
-        const request = pool.request();
-        
-        request.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
+        request.input('usuarioId', sql.Binary(16), usuarioIdBinary);
         request.input('suceso', sql.NVarChar, suceso);
         
         const query = `
             INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-            VALUES (@usuarioEmail, @suceso, GETDATE())
+            VALUES (@usuarioId, @suceso, GETDATE())
         `;
         
         await request.query(query);
@@ -75,6 +75,7 @@ export async function registrarEnBitácora(usuarioEmail, suceso) {
         // No propagar el error para que no interrumpa la operación principal
     }
 }
+
 
 // Modificar getAllBooks para manejar el caso de email
 export async function getAllBooks(usuarioEmail, { genre = null, author = null, editorial = null }) {
@@ -357,175 +358,159 @@ export async function createBook(bookData, usuarioEmail) {
     }
 }
 
-// Mejorar updateBookState para mostrar mensaje de eliminación de solicitud
-export async function updateBookState(id, estado, usuarioEmail, solicitudId = null) {
+//Ruta para editar libros especificos 
+export async function updateBook(id, bookData, usuarioEmail) {
     try {
         const pool = await db.connect();
-
         const transaction = new sql.Transaction(db);
-        
-        await transaction.begin();
-        
-        try {
-            // Actualizar estado del libro
-            const updateRequest = new sql.Request(transaction);
-            updateRequest.input('id', sql.UniqueIdentifier, id);
-            updateRequest.input('estado', sql.NVarChar, estado);
-            
-            const updateQuery = `
-                UPDATE Libro
-                SET Estado = @estado
-                OUTPUT INSERTED.*
-                WHERE LibroID = @id
-            `;
-            
-            const result = await updateRequest.query(updateQuery);
-            
-            if (result.recordset.length === 0) {
-                await transaction.rollback();
-                return { success: false, message: "Libro no encontrado" };
-            }
-            
-            let solicitudEliminada = false;
-            
-            // Si hay una solicitud, eliminarla
-            if (solicitudId) {
-                const deleteSolicitudRequest = new sql.Request(transaction);
-                deleteSolicitudRequest.input('solicitudId', sql.Int, solicitudId);
-                
-                const deleteResult = await deleteSolicitudRequest.query(`
-                    DELETE FROM Solicitud WHERE SolicitudID = @solicitudId
-                `);
-                
-                solicitudEliminada = deleteResult.rowsAffected[0] > 0;
-            }
-            
-            // Registrar en bitácora
-            if (usuarioEmail) {
-                const bitacoraRequest = new sql.Request(transaction);
-                
-                // Convertir el ID de usuario a formato binario si es necesario
-                let usuarioIdBinary;
-                if (typeof usuarioEmail === 'string' && usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
-                    // Es un string hexadecimal, conviértelo a Buffer
-                    const normalizedHex = usuarioEmail.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
-                    usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
-                } else if (typeof usuarioEmail === 'string' && usuarioEmail.includes('@')) {
-                    // Es un email, buscar el ID real
-                    const userQuery = await pool.request()
-                        .input('email', sql.NVarChar, usuarioEmail)
-                        .query('SELECT UsuarioID FROM Usuarios WHERE Email = @email');
-                        
-                    if (userQuery.recordset.length > 0) {
-                        usuarioIdBinary = userQuery.recordset[0].UsuarioID;
-                    }
-                } else {
-                    // Ya es un Buffer o un valor binario
-                    usuarioIdBinary = usuarioEmail;
-                }
-                
-                if (usuarioIdBinary) {
-                    bitacoraRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
-                    bitacoraRequest.input('suceso', sql.NVarChar, `Actualización del estado del libro ID ${id} a "${estado}"`);
-                    
-                    await bitacoraRequest.query(`
-                        INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-                        VALUES (@usuarioEmail, @suceso, GETDATE())
-                    `);
-                }
-            }
-            
-            await transaction.commit();
-            
-            const libro = await getBookById(id);
-            return { 
-                success: true, 
-                libro, 
-                message: "Estado actualizado correctamente", 
-                solicitudEliminada,
-                solicitudId: solicitudEliminada ? solicitudId : null
-            };
-        } catch (error) {
-            console.error("Error durante la transacción:", error);
-            if (!transaction._aborted) {
-                await transaction.rollback();
-            }
-        }
-    } catch (error) {
-        console.error('Error al actualizar estado del libro:', error);
-    }
-}
 
-// Modificar requestBook para que NO cambie el estado del libro
-export async function requestBook(id, usuarioEmail) {
-        const pool = await db.connect();
-
-        const transaction = new sql.Transaction(db);
-        
         await transaction.begin();
-        
+
         try {
             // Verificar si el libro existe
             const checkRequest = new sql.Request(transaction);
             checkRequest.input('id', sql.UniqueIdentifier, id);
-            
+
+            const checkQuery = `
+                SELECT LibroID FROM Libro 
+                WHERE LibroID = @id
+            `;
+            const checkResult = await checkRequest.query(checkQuery);
+
+            if (checkResult.recordset.length === 0) {
+                await transaction.rollback();
+                return { success: false, message: "Libro no encontrado" };
+            }
+
+            // Construir dinámicamente la consulta de actualización
+            const fieldsToUpdate = [];
+            const updateRequest = new sql.Request(transaction);
+
+            if (bookData.nombre) {
+                fieldsToUpdate.push("Nombre = @nombre");
+                updateRequest.input('nombre', sql.NVarChar, bookData.nombre);
+            }
+            if (bookData.rating) {
+                fieldsToUpdate.push("Rating = @rating");
+                updateRequest.input('rating', sql.Numeric(3, 2), bookData.rating);
+            }
+            if (bookData.autorId) {
+                fieldsToUpdate.push("AutorID = @autorId");
+                updateRequest.input('autorId', sql.Int, bookData.autorId);
+            }
+            if (bookData.editorialId) {
+                fieldsToUpdate.push("EditorialID = @editorialId");
+                updateRequest.input('editorialId', sql.Int, bookData.editorialId);
+            }
+
+            // Si no hay campos para actualizar, devolver un mensaje
+            if (fieldsToUpdate.length === 0) {
+                await transaction.rollback();
+                return { success: false, message: "No hay campos válidos para actualizar" };
+            }
+
+            // Agregar el ID del libro
+            updateRequest.input('id', sql.UniqueIdentifier, id);
+
+            const updateQuery = `
+                UPDATE Libro
+                SET ${fieldsToUpdate.join(", ")}
+                WHERE LibroID = @id
+            `;
+
+            await updateRequest.query(updateQuery);
+
+            // Registrar en bitácora
+            if (usuarioEmail) {
+                await registrarEnBitácora(usuarioEmail, `Actualización del libro ID ${id}`);
+            }
+
+            await transaction.commit();
+            console.log("Libro actualizado correctamente");
+
+            // Retornar el libro actualizado
+            const updatedBook = await getBookById(id);
+            return { success: true, libro: updatedBook };
+        } catch (error) {
+            console.error('Error durante la transacción:', error);
+            if (!transaction._aborted) {
+                await transaction.rollback();
+            }
+            return { success: false, message: "Error al actualizar el libro" };
+        }
+    } catch (error) {
+        console.error('Error al actualizar libro:', error);
+        return { success: false, message: "Error al conectar con la base de datos" };
+    }
+}
+
+// Modificar requestBook para que NO cambie el estado del libro
+export async function requestBook(id, usuarioId, usuarioEmail) {
+    try {
+        const pool = await db.connect();
+        const transaction = new sql.Transaction(pool);
+
+        await transaction.begin();
+
+        try {
+            // Verificar si el libro existe
+            const checkRequest = new sql.Request(transaction);
+            checkRequest.input('id', sql.UniqueIdentifier, id);
+
             const checkQuery = `
                 SELECT LibroID, Nombre, Estado FROM Libro 
                 WHERE LibroID = @id
             `;
             const checkResult = await checkRequest.query(checkQuery);
-            
+
             if (checkResult.recordset.length === 0) {
                 await transaction.rollback();
                 return { success: false, message: "Libro no encontrado" };
             }
-            
+
             const nombreLibro = checkResult.recordset[0].Nombre;
             const estadoActual = checkResult.recordset[0].Estado;
-            
+
             // Verificar si el libro está disponible
             if (estadoActual !== 'Disponible') {
                 await transaction.rollback();
                 return { success: false, message: "El libro no está disponible actualmente" };
             }
-            
-            // Convertir el ID de usuario a formato binario si viene en formato hexadecimal
+
+            // Convertir el ID de usuario al formato binario (Buffer) desde el formato hexadecimal
             let usuarioIdBinary;
-            if (typeof usuarioEmail === 'string' && usuarioEmail.match(/^[0-9a-fA-F]+$/)) {
-                // Es un string hexadecimal, conviértelo a Buffer
-                const normalizedHex = usuarioEmail.replace(/^0x/, '').padStart(32, '0').substring(0, 32);
-                usuarioIdBinary = Buffer.from(normalizedHex, 'hex');
+            if (typeof usuarioId === 'string' && usuarioId.startsWith('0x') && usuarioId.length === 34) {
+                // Convertir el formato hexadecimal (0x...) a un Buffer
+                usuarioIdBinary = Buffer.from(usuarioId.slice(2), 'hex');
             } else {
-                // Ya es un Buffer o un valor binario
-                usuarioIdBinary = usuarioEmail;
+                await transaction.rollback();
+                return { success: false, message: "Formato de UsuarioID inválido. Debe ser un string hexadecimal de 16 bytes con prefijo '0x'." };
             }
-            
+
             // Insertar en la tabla Solicitud
             const solicitudRequest = new sql.Request(transaction);
-            solicitudRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
+            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
             solicitudRequest.input('libroId', sql.UniqueIdentifier, id);
-            
+            solicitudRequest.input('estado', sql.NVarChar, 'Pendiente'); // Estado predeterminado: Pendiente
+
             const solicitudQuery = `
-                INSERT INTO Solicitud (UsuarioID, LibroID, FechaSolicitud)
+                INSERT INTO Solicitud (UsuarioID, LibroID, Estado, FechaSolicitud)
                 OUTPUT INSERTED.SolicitudID
-                VALUES (@usuarioEmail, @libroId, GETDATE())
+                VALUES (@usuarioId, @libroId, @estado, GETDATE())
             `;
             const solicitudResult = await solicitudRequest.query(solicitudQuery);
             const solicitudId = solicitudResult.recordset[0].SolicitudID;
-            
-            // Registrar en Bitacora
-            const bitacoraRequest = new sql.Request(transaction);
-            bitacoraRequest.input('usuarioEmail', sql.Binary(16), usuarioIdBinary);
-            bitacoraRequest.input('suceso', sql.NVarChar, `Solicitud del libro: ${nombreLibro} (ID: ${id})`);
-            
-            const bitacoraQuery = `
-                INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
-                VALUES (@usuarioEmail, @suceso, GETDATE())
-            `;
-            await bitacoraRequest.query(bitacoraQuery);
-            
+
+            // Registrar en Bitácora usando la función registrarEnBitácora
+            if (usuarioEmail) {
+                await registrarEnBitácora(
+                    usuarioEmail,
+                    `Solicitud del libro: ${nombreLibro} (ID: ${id})`
+                );
+            }
+
             await transaction.commit();
-            
+
             // Devolver el resultado exitoso con el ID de solicitud
             return { 
                 success: true, 
@@ -534,14 +519,18 @@ export async function requestBook(id, usuarioEmail) {
                 nombreLibro,
                 libroId: id
             };
-            
+
         } catch (error) {
             console.error("Error durante la transacción:", error);
             if (!transaction._aborted) {
                 await transaction.rollback();
             }
+            return { success: false, message: "Error al registrar la solicitud" };
         }
-
+    } catch (error) {
+        console.error('Error al solicitar libro:', error);
+        return { success: false, message: "Error al conectar con la base de datos" };
+    }
 }
 
 // Función para obtener todas las solicitudes (solo para administradores)
@@ -709,4 +698,155 @@ export async function editorialExists(editorial) {
 
     return true
 }
+
+// Nueva función completamente independiente
+export async function updateBookState(solicitudId, estado, usuarioEmail, libroID = null) {
+    try {
+        console.log(`Iniciando actualización para solicitud ${solicitudId} a estado ${estado}`);
+        
+        // Validar el ID de solicitud
+        const solicitudIdNum = parseInt(solicitudId, 10);
+        if (isNaN(solicitudIdNum)) {
+            return { success: false, message: "ID de solicitud no válido" };
+        }
+        
+        // Conectar a la base de datos
+        const pool = await db.connect();
+        
+        // Datos del libro y la solicitud
+        let solicitudInfo, libroInfo;
+        
+        // Si se proporcionó un libroID, lo usamos directamente
+        if (libroID) {
+            console.log(`Usando libroID proporcionado: ${libroID}`);
+            
+            // 1. Verificar si la solicitud existe
+            const checkSolicitud = await pool.request()
+                .input('solicitudNum', sql.Int, solicitudIdNum)
+                .query('SELECT Estado FROM Solicitud WHERE SolicitudID = @solicitudNum');
+                
+            if (checkSolicitud.recordset.length === 0) {
+                return { success: false, message: "Solicitud no encontrada" };
+            }
+            
+            // 2. Obtener información del libro usando el libroID proporcionado
+            const libroResult = await pool.request()
+                .input('libroIdDirecto', sql.NVarChar, libroID) // Usar como string para evitar problemas de GUID
+                .query(`
+                    SELECT Nombre, Estado 
+                    FROM Libro 
+                    WHERE LibroID = CAST(@libroIdDirecto AS UNIQUEIDENTIFIER)
+                `);
+                
+            if (libroResult.recordset.length === 0) {
+                return { success: false, message: "Libro no encontrado" };
+            }
+            
+            libroInfo = libroResult.recordset[0];
+            
+            // 3. Ejecutar actualización directa del libro (sin usar parámetro UniqueIdentifier)
+            await pool.request()
+                .input('nuevoEstado', sql.NVarChar, estado)
+                .input('libroIdTexto', sql.NVarChar, libroID)
+                .query(`
+                    UPDATE Libro
+                    SET Estado = @nuevoEstado
+                    WHERE LibroID = CAST(@libroIdTexto AS UNIQUEIDENTIFIER)
+                `);
+        } 
+        else {
+            console.log(`Buscando información de la solicitud ID: ${solicitudIdNum}`);
     
+            // 1. Obtener información de la solicitud incluyendo el LibroID
+            const solicitudResult = await pool.request()
+                .input('solicitudNum', sql.Int, solicitudIdNum)
+                .query(`
+                    SELECT S.SolicitudID, S.LibroID, S.Estado AS EstadoSolicitud, 
+                           L.Nombre, L.Estado AS EstadoLibro
+                    FROM Solicitud S
+                    JOIN Libro L ON S.LibroID = L.LibroID
+                    WHERE S.SolicitudID = @solicitudNum
+                `);
+                
+            if (solicitudResult.recordset.length === 0) {
+                return { success: false, message: "Solicitud no encontrada" };
+            }
+            
+            // 2. Obtener datos de la solicitud y del libro
+            solicitudInfo = solicitudResult.recordset[0];
+            libroInfo = {
+                Nombre: solicitudInfo.Nombre,
+                Estado: solicitudInfo.EstadoLibro
+            };
+            
+            // 3. Ejecutar actualización del libro usando el LibroID obtenido de la solicitud
+            // Convertir el GUID a string para evitar problemas con el parámetro
+            const libroIDString = solicitudInfo.LibroID.toString();
+            
+            console.log(`Actualizando libro ID ${libroIDString} a estado ${estado}`);
+            
+            await pool.request()
+                .input('nuevoEstado', sql.NVarChar, estado)
+                .input('libroIdTexto', sql.NVarChar, libroIDString)
+                .query(`
+                    UPDATE Libro
+                    SET Estado = @nuevoEstado
+                    WHERE LibroID = CAST(@libroIdTexto AS UNIQUEIDENTIFIER)
+                `);
+        }
+        
+        // Actualizar la solicitud
+        await pool.request()
+            .input('solicitudNum', sql.Int, solicitudIdNum)
+            .query(`
+                UPDATE Solicitud
+                SET Estado = 'Completado'
+                WHERE SolicitudID = @solicitudNum
+            `);
+            
+        // Registrar en bitácora
+        if (usuarioEmail) {
+            try {
+                // Buscar el ID del usuario por email
+                const userResult = await pool.request()
+                    .input('emailUsuario', sql.NVarChar, usuarioEmail)
+                    .query(`SELECT UsuarioID FROM Usuarios WHERE Email = @emailUsuario`);
+                    
+                if (userResult.recordset.length > 0) {
+                    const usuarioIdBinario = userResult.recordset[0].UsuarioID;
+                    
+                    // Insertar en bitácora usando nombre de parámetro específico
+                    await pool.request()
+                        .input('usuarioParam', sql.VarBinary, usuarioIdBinario) // No usar UniqueIdentifier
+                        .input('suceso', sql.NVarChar, `Actualización del libro "${libroInfo.Nombre}" de estado "${libroInfo.Estado}" a "${estado}"`)
+                        .input('fecha', sql.DateTime, new Date())
+                        .query(`
+                            INSERT INTO Bitacora (UsuarioID, Sucesos, Fecha)
+                            VALUES (@usuarioParam, @suceso, @fecha)
+                        `);
+                }
+            } catch (logError) {
+                console.warn("Error no crítico en bitácora:", logError);
+            }
+        }
+        
+        return {
+            success: true,
+            message: "Estado actualizado correctamente",
+            datos: {
+                solicitudId: solicitudIdNum,
+                libroId: libroID,
+                nombreLibro: libroInfo.Nombre,
+                estadoAnterior: libroInfo.Estado,
+                nuevoEstado: estado
+            }
+        };
+    } catch (error) {
+        console.error("Error general:", error);
+        return { 
+            success: false, 
+            message: "Error al procesar la solicitud", 
+            error: error.message 
+        };
+    }
+}

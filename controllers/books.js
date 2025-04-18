@@ -67,36 +67,6 @@ export default class BookController {
         }
     }
 
-    static updateState = async (req, res) => {
-        const id = req.params.id;
-        const { estado, solicitudId } = req.body;
-        // Obtener el email del usuario desde el token
-        const usuarioEmail = req.params.email;
-
-        if (!estado || !['Disponible', 'Prestado'].includes(estado)) {
-            return errorResponse(res, 400, 'Estado inválido. Debe ser "Disponible" o "Prestado"');
-        }
-
-        try {
-            const result = await BookModel.updateBookState(id, estado, usuarioEmail, solicitudId);
-            
-            if (!result.success) {
-                return errorResponse(res, 404, result.message);
-            }
-            
-            // Personalizar el mensaje según si se eliminó una solicitud
-            let mensaje = 'Estado del libro actualizado correctamente';
-            if (result.solicitudEliminada) {
-                mensaje += `. Solicitud #${result.solicitudId} eliminada con éxito.`;
-            }
-            
-            successResponse(res, 200, result.libro, mensaje);
-        }
-        catch(err){
-            // return errorResponse(res, 500, 'Error al actualizar el estado del libro', err.message);
-            console.error(`Error al actualizar el estado del libro ${err}`)
-        }
-    }
 
     static update = async (req, res) => {
         const id = req.params.id
@@ -141,14 +111,14 @@ export default class BookController {
 
     static requestBook = async (req, res) => {
         const { id } = req.params;
-        const { usuarioEmail } = req.body;
+        const { usuarioId } = req.body;
 
-        if (!usuarioEmail) {
+        if (!usuarioId) {
             return errorResponse(res, 400, 'ID de usuario requerido');
         }
 
         try {
-            const result = await BookModel.requestBook(id, usuarioEmail);
+            const result = await BookModel.requestBook(id, usuarioId);
             
             if (!result.success) {
                 return errorResponse(res, 404, result.message);
@@ -156,7 +126,7 @@ export default class BookController {
             
             successResponse(res, 200, result, 'Solicitud de libro registrada correctamente');
         } catch (err) {
-            console.error(`Error al solicitar libro ${err}`);
+            errorResponse(res, 500, 'Error al procesar la solicitud del libro', err.message);
         }
     }
 
@@ -218,5 +188,33 @@ export default class BookController {
         
     }
 
+    static updateState = async (req, res) => {
+        try {
+            const { solicitudId, estado, libroID } = req.body;
+            
+            if (!solicitudId || !estado) {
+                return res.status(400).json({
+                    success: false, 
+                    message: 'Faltan datos requeridos: solicitudId y estado'
+                });
+            }
+            
+            // Obtener email del token
+            const usuarioEmail = req.params.email;
+            
+            // Llamar al modelo con el libroID adicional
+            const result = await BookModel.updateBookState(solicitudId, estado, usuarioEmail, libroID);
+            
+            return res.status(result.success ? 200 : 400).json(result);
+            
+        } catch (error) {
+            console.error('Error en updateState:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
+    }
         
 }
