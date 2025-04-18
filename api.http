@@ -68,7 +68,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ5OTM5LCJleHAiOjE3NDQ5NTE3Mzl9.V6bD_0gJv8laRv7-G2DXqDRDpZ0eFK5xBJLtdM0Ta0U
 
 ### GET PARA LIBROS con filtros
 GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
@@ -76,7 +76,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ5OTM5LCJleHAiOjE3NDQ5NTE3Mzl9.V6bD_0gJv8laRv7-G2DXqDRDpZ0eFK5xBJLtdM0Ta0U
 
 ### GET UN LIBRO POR ID 
 GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
@@ -132,10 +132,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
 POST http://localhost:3000/libros/5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c/solicitar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTUxOTY2LCJleHAiOjE3NDQ5NTM3NjZ9.6LHlq57gxc0J2ebOooa_sZlloffq-7wmupTRYWRrmGs
 
 {
-    "usuarioId": "0x1C944146C0115A419671A13A4FF36FD2"
+    "nombreUsuario": "Carlos Sanchez"
 }
 
 ### VER TODAS LAS SOLICITUDES (solo admins)(Desoues de realizar la solicitud de un libro, se usa esta ruta para ver las solictudes pendientes)
@@ -146,10 +146,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ###Si en la tabla dice que esta disbonible, se cambia a prestado y viceversa y se pone el id de la solicitud, para eliminarla)
 PATCH http://localhost:3000/libros/estado
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTUxOTY2LCJleHAiOjE3NDQ5NTM3NjZ9.6LHlq57gxc0J2ebOooa_sZlloffq-7wmupTRYWRrmGs
 
 {
-    "solicitudId": 9,
+    "solicitudId": 11,
     "estado": "Disponible",
     "libroID": "5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c"
 }

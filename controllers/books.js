@@ -123,14 +123,14 @@ export default class BookController {
 
     static requestBook = async (req, res) => {
         const id = req.params.id;
-        const { usuarioId } = req.body;
+        const { nombreUsuario } = req.body;
 
-        if (!usuarioId) {
-            return errorResponse(res, 400, 'ID de usuario requerido');
+        if (!nombreUsuario) {
+            return errorResponse(res, 400, 'Nombre de usuario requerido');
         }
 
         try {
-            const result = await BookModel.requestBook(id, usuarioId);
+            const result = await BookModel.requestBook(id, nombreUsuario);
             
             if (!result.success) {
                 return errorResponse(res, 404, result.message);

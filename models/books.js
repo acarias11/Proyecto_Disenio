@@ -442,9 +442,10 @@ export async function updateBook (id, bookData, usuarioEmail) {
     }
 }
 
-// Modificar requestBook para que NO cambie el estado del libro
-export async function requestBook(id, usuarioId, usuarioEmail) {
+// Modificar requestBook para aceptar nombreUsuario en lugar de ID
+export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
     try {
+        console.log(`Procesando solicitud: Libro ${id}, Usuario ${nombreUsuarioOEmail}`);
         const pool = await db.connect();
         const transaction = new sql.Transaction(pool);
 
@@ -475,21 +476,31 @@ export async function requestBook(id, usuarioId, usuarioEmail) {
                 return { success: false, message: "El libro no está disponible actualmente" };
             }
 
-            // Convertir el ID de usuario al formato binario (Buffer) desde el formato hexadecimal
-            let usuarioIdBinary;
-            if (typeof usuarioId === 'string' && usuarioId.startsWith('0x') && usuarioId.length === 34) {
-                // Convertir el formato hexadecimal (0x...) a un Buffer
-                usuarioIdBinary = Buffer.from(usuarioId.slice(2), 'hex');
-            } else {
+            // Buscar el usuario por nombre o email
+            const buscarUsuarioRequest = new sql.Request(transaction);
+            buscarUsuarioRequest.input('usuario', sql.NVarChar, nombreUsuarioOEmail);
+            
+            const buscarUsuarioQuery = `
+                SELECT UsuarioID, Nombre, Email 
+                FROM Usuarios 
+                WHERE Nombre = @usuario OR Email = @usuario
+            `;
+            
+            const usuarioResult = await buscarUsuarioRequest.query(buscarUsuarioQuery);
+            
+            if (usuarioResult.recordset.length === 0) {
                 await transaction.rollback();
-                return { success: false, message: "Formato de UsuarioID inválido. Debe ser un string hexadecimal de 16 bytes con prefijo '0x'." };
+                return { success: false, message: "Usuario no encontrado" };
             }
+            
+            const usuarioInfo = usuarioResult.recordset[0];
+            const usuarioId = usuarioInfo.UsuarioID;
 
-            // Insertar en la tabla Solicitud
+            // Insertar en la tabla Solicitud usando el UsuarioID encontrado
             const solicitudRequest = new sql.Request(transaction);
-            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioIdBinary);
+            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioId); // Formato binario
             solicitudRequest.input('libroId', sql.UniqueIdentifier, id);
-            solicitudRequest.input('estado', sql.NVarChar, 'Pendiente'); // Estado predeterminado: Pendiente
+            solicitudRequest.input('estado', sql.NVarChar, 'Pendiente');
 
             const solicitudQuery = `
                 INSERT INTO Solicitud (UsuarioID, LibroID, Estado, FechaSolicitud)
@@ -499,34 +510,55 @@ export async function requestBook(id, usuarioId, usuarioEmail) {
             const solicitudResult = await solicitudRequest.query(solicitudQuery);
             const solicitudId = solicitudResult.recordset[0].SolicitudID;
 
-            // Registrar en Bitácora usando la función registrarEnBitácora
+            // Actualizar estado del libro a "Solicitado"
+            const updateRequest = new sql.Request(transaction);
+            updateRequest.input('libroId', sql.UniqueIdentifier, id);
+            await updateRequest.query(`
+                UPDATE Libro 
+                SET Estado = 'Prestado' 
+                WHERE LibroID = @libroId
+            `);
+
+            // Registrar en Bitácora
             if (usuarioEmail) {
                 await registrarEnBitácora(
                     usuarioEmail,
-                    `Solicitud del libro: ${nombreLibro} (ID: ${id})`
+                    `Solicitud del libro "${nombreLibro}" para usuario: ${usuarioInfo.Nombre}`
                 );
             }
 
             await transaction.commit();
 
             // Devolver el resultado exitoso con el ID de solicitud
-            return {success: true, data: { 
-                message: "Solicitud registrada correctamente", 
-                solicitudId,
-                nombreLibro,
-                libroId: id
-            }};
+            return {
+                success: true, 
+                data: { 
+                    message: "Solicitud registrada correctamente", 
+                    solicitudId,
+                    nombreLibro,
+                    libroId: id,
+                    usuario: usuarioInfo.Nombre
+                }
+            };
 
         } catch (error) {
             console.error("Error durante la transacción:", error);
             if (!transaction._aborted) {
                 await transaction.rollback();
             }
-            return { success: false, message: "Error al registrar la solicitud" };
+            return { 
+                success: false, 
+                message: "Error al registrar la solicitud", 
+                error: error.message 
+            };
         }
     } catch (error) {
         console.error('Error al solicitar libro:', error);
-        return { success: false, message: "Error al conectar con la base de datos" };
+        return { 
+            success: false, 
+            message: "Error al conectar con la base de datos", 
+            error: error.message 
+        };
     }
 }
 
