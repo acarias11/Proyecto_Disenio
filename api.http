@@ -132,11 +132,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
 POST http://localhost:3000/libros/5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c/solicitar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTUxOTY2LCJleHAiOjE3NDQ5NTM3NjZ9.6LHlq57gxc0J2ebOooa_sZlloffq-7wmupTRYWRrmGs
-
-{
-    "nombreUsuario": "Carlos Sanchez"
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpoZXJuYW5kZXoxOUBvdXRsb29rLmNvbSIsInJvbCI6IlVzZXIiLCJpYXQiOjE3NDQ5NTMxMzYsImV4cCI6MTc0NDk1NDkzNn0.HnSKfSaAVo-3KlsW5fc0PP2cF7MgTm2EXRA8x7eOoTw
 
 ### VER TODAS LAS SOLICITUDES (solo admins)(Desoues de realizar la solicitud de un libro, se usa esta ruta para ver las solictudes pendientes)
 GET http://localhost:3000/libros/solicitudes/all

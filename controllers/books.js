@@ -122,15 +122,19 @@ export default class BookController {
     }
 
     static requestBook = async (req, res) => {
-        const id = req.params.id;
-        const { nombreUsuario } = req.body;
-
-        if (!nombreUsuario) {
-            return errorResponse(res, 400, 'Nombre de usuario requerido');
+        const id = req.params.id; // ID del libro
+        
+        // Obtener email del usuario autenticado (del token JWT)
+        // Nota: Debe ser req.user.email, no req.params.email (a menos que tu middleware lo configure así)
+        const usuarioEmail = req.params.email;
+        
+        if (!usuarioEmail) {
+            return errorResponse(res, 401, 'Usuario no autenticado o email no disponible');
         }
 
         try {
-            const result = await BookModel.requestBook(id, nombreUsuario);
+            // Ya no necesitamos enviar nombreUsuario, usamos el email del token
+            const result = await BookModel.requestBook(id, usuarioEmail);
             
             if (!result.success) {
                 return errorResponse(res, 404, result.message);

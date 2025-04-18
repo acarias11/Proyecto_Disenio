@@ -443,9 +443,9 @@ export async function updateBook (id, bookData, usuarioEmail) {
 }
 
 // Modificar requestBook para aceptar nombreUsuario en lugar de ID
-export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
+export async function requestBook(id, usuarioEmail) {
     try {
-        console.log(`Procesando solicitud: Libro ${id}, Usuario ${nombreUsuarioOEmail}`);
+        console.log(`Procesando solicitud: Libro ${id}, Usuario por email ${usuarioEmail}`);
         const pool = await db.connect();
         const transaction = new sql.Transaction(pool);
 
@@ -476,14 +476,14 @@ export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
                 return { success: false, message: "El libro no está disponible actualmente" };
             }
 
-            // Buscar el usuario por nombre o email
+            // Buscar el usuario por su email (que viene del token)
             const buscarUsuarioRequest = new sql.Request(transaction);
-            buscarUsuarioRequest.input('usuario', sql.NVarChar, nombreUsuarioOEmail);
+            buscarUsuarioRequest.input('email', sql.NVarChar, usuarioEmail);
             
             const buscarUsuarioQuery = `
                 SELECT UsuarioID, Nombre, Email 
                 FROM Usuarios 
-                WHERE Nombre = @usuario OR Email = @usuario
+                WHERE Email = @email
             `;
             
             const usuarioResult = await buscarUsuarioRequest.query(buscarUsuarioQuery);
@@ -496,9 +496,9 @@ export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
             const usuarioInfo = usuarioResult.recordset[0];
             const usuarioId = usuarioInfo.UsuarioID;
 
-            // Insertar en la tabla Solicitud usando el UsuarioID encontrado
+            // Insertar en la tabla Solicitud con el ID del usuario autenticado
             const solicitudRequest = new sql.Request(transaction);
-            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioId); // Formato binario
+            solicitudRequest.input('usuarioId', sql.Binary(16), usuarioId);
             solicitudRequest.input('libroId', sql.UniqueIdentifier, id);
             solicitudRequest.input('estado', sql.NVarChar, 'Pendiente');
 
@@ -510,7 +510,7 @@ export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
             const solicitudResult = await solicitudRequest.query(solicitudQuery);
             const solicitudId = solicitudResult.recordset[0].SolicitudID;
 
-            // Actualizar estado del libro a "Solicitado"
+            // Actualizar estado del libro a "Prestado"
             const updateRequest = new sql.Request(transaction);
             updateRequest.input('libroId', sql.UniqueIdentifier, id);
             await updateRequest.query(`
@@ -520,16 +520,14 @@ export async function requestBook(id, nombreUsuarioOEmail, usuarioEmail) {
             `);
 
             // Registrar en Bitácora
-            if (usuarioEmail) {
-                await registrarEnBitácora(
-                    usuarioEmail,
-                    `Solicitud del libro "${nombreLibro}" para usuario: ${usuarioInfo.Nombre}`
-                );
-            }
+            await registrarEnBitácora(
+                usuarioEmail,
+                `Solicitud del libro "${nombreLibro}"`
+            );
 
             await transaction.commit();
 
-            // Devolver el resultado exitoso con el ID de solicitud
+            // Devolver el resultado exitoso
             return {
                 success: true, 
                 data: { 
