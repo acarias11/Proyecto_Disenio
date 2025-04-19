@@ -18,8 +18,9 @@ export default class UserController {
         
     } catch (error) {
         console.error('Error al obtener los usuarios:', error)
-        // return errorResponse(res, 500, 'Error al obtener los usuarios');
-    } }
+        errorResponse(res, 500, 'Error al obtener los usuarios');
+    } 
+    }
 
     static verificarUsuario = async (req, res) => {
 
@@ -43,5 +44,6 @@ export default class UserController {
 
         } catch (error) {
             console.error('Error al verificar el usuario:', error);
+            errorResponse(res, 500, 'Error al verificar el usuario');
         }
 }}

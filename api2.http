@@ -3,21 +3,20 @@
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### GET PARA LIBROS con filtros
-GET http://localhost:3000/libros?genre=Realismo%magico&author=Isabel
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
-
+GET http://localhost:3000/libros?genre=Realismo%mágico&author=Isabel
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### GET UN LIBRO POR ID 
-GET http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+GET http://localhost:3000/libros/9F0EA9B8-83E6-4D55-B67D-4E418466DC80
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### CREAR UN NUEVO LIBRO (EL AUTOR Y LA EDITORIAL DEBEN EXISTIR EN LA BD)
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "nombre": "Crónica de una muerte anunciada",
@@ -34,7 +33,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Crear otro libro
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "nombre": "Sofia Sofia",
@@ -51,53 +50,53 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Actualizar un libro (PATCH)
 PATCH http://localhost:3000/libros/5A07E00B-99B0-45EC-A7F7-1771D5EB1A6C
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "rating": 4.0
 }
 
 ### ELIMINAR UN LIBRO 
-DELETE http://localhost:3000/libros/62FABF5C-8481-451F-9A72-C0DEF70EADB8
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ0OTQ1MzQ5LCJleHAiOjE3NDQ5NDcxNDl9.7RGRLin6mPekMjJsyqPHPqBc6LIA6XmB856TtloTtQE
+DELETE http://localhost:3000/libros/9F433BF7-7A36-46C9-AC75-7AAE8F6BCA57
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
 POST http://localhost:3000/libros/solicitar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
-    "id": "9F0EA9B8-83E6-4D55-B67D-4E418466DC80"
+    "id": "688CCE10-D595-407E-A46E-94D0E2B84E4F"
 }
 
 ### VER TODAS LAS SOLICITUDES (solo admins)(Desoues de realizar la solicitud de un libro, se usa esta ruta para ver las solictudes pendientes)
 GET http://localhost:3000/libros/solicitudes/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### Actualizar estado de una solicitud (solo admins) (Despues de verificaer la solicitudes pendientes, se usa esta ruta para actualizar el estado del libro
 ###Si en la tabla dice que esta disbonible, se cambia a prestado y viceversa y se pone el id de la solicitud, para eliminarla)
 PATCH http://localhost:3000/libros/estado
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
-    "solicitudId": 11,
+    "solicitudId": 13,
     "estado": "Disponible",
-    "libroID": "5a07e00b-99b0-45ec-a7f7-1771d5eb1a6c"
+    "libroID": "9F0EA9B8-83E6-4D55-B67D-4E418466DC80"
 }
 
 ### Ver historial de eventos (solo admins)
 GET http://localhost:3000/logs
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### Ver historial de eventos de un usuario (solo admins)
 GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 ### Crear un nuevo autor
 POST http://localhost:3000/libros/author
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "nombre": "Charles",
@@ -109,7 +108,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Crear una editorial
 POST http://localhost:3000/libros/editorial
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "nombre": "HarperCollins",
@@ -119,7 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Actualizar un libro
 PUT http://localhost:3000/libros/E25BD787-39F5-48CB-ACEE-27004E4258C7
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDA5ODU3LCJleHAiOjE3NDUwMTE2NTd9.wueccvLm-fAhRjQQqCHBWjF468Do4_34SMqpvKeUXgo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
 
 {
     "nombre": "Crónica de una muerte anunciada",
@@ -131,7 +130,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
     "paginas": 120,
     "idioma": "Español",
     "generos" : [
-        "Ficcion",
+        "Ficción",
         "Novela"
     ]
 }

@@ -60,6 +60,7 @@ export default class AuthController {
 
         } catch (error) {
             console.error('Error en login:', error);
+            errorResponse(res, 500, 'Ocurrio un error al iniciar sesión');
         }
     }
 
@@ -101,6 +102,7 @@ export default class AuthController {
 
         } catch (error) {
             console.error('Error en register:', error);
+            errorResponse(res, 500, 'Ocurrió un error al registrarse');
         }
     }
 
@@ -138,6 +140,7 @@ export default class AuthController {
 
         } catch (error) {
             console.error('Error en registerAdmin:', error);
+            errorResponse(res, 500, 'Ocurrió un error al registrar el administrador');
         }
     }
 }

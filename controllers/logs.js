@@ -18,7 +18,8 @@ export default class LogsController {
             successResponse(res, 200, result, 'Eventos de la bitácora obtenidos correctamente');
 
         } catch (err) {
-            console.error(err);
+            console.error(`Error al obtener los eventos de la bitácora: ${err}`);
+            errorResponse(res, 500, 'Error al obtener los eventos de la bitácora');
         }
     }
 
@@ -44,7 +45,8 @@ export default class LogsController {
             successResponse(res, 200, result, 'Eventos de la bitácora obtenidos correctamente');
 
         } catch (err) {
-            console.error(err);
+            console.error(`Error al obtener los eventos de la bitácora del usuario: ${err}`);
+            errorResponse(res, 500, 'Error al obtener los eventos de la bitácora del usuario');
         }
     }
 }

@@ -835,10 +835,7 @@ export async function updateBookState(solicitudId, estado, usuarioEmail, libroID
             
             // 2. Obtener datos de la solicitud y del libro
             solicitudInfo = solicitudResult.recordset[0];
-            libroInfo = {
-                Nombre: solicitudInfo.Nombre,
-                Estado: solicitudInfo.EstadoLibro
-            };
+            libroInfo = {...solicitudInfo};
             
             // 3. Ejecutar actualización del libro usando el LibroID obtenido de la solicitud
             // Convertir el GUID a string para evitar problemas con el parámetro

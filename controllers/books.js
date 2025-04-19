@@ -41,8 +41,8 @@ export default class BookController {
                             }
             successResponse(res, 200, result, 'Libro obtenido correctamente')
         } catch(err) {
-            // return errorResponse(res, 500, 'Error al obtener el libro', err.message)
-            console.error(`Error al obtener el libro ${err}`)
+            console.error(`Error al obtener el libro: ${err}`)
+            errorResponse(res, 500, 'Error al obtener el libro')
         }
     }
 
@@ -62,8 +62,8 @@ export default class BookController {
             const result = await BookModel.createBook(data, usuarioEmail)
             successResponse(res, 201, result, 'Libro creado exitosamente');
         } catch (err) {
-            // return errorResponse(res, 500, 'Error al crear libro', err.message);
             console.error(`Error al crear libro ${err}`)
+            errorResponse(res, 500, 'Error al crear libro');
         }
     }
 
@@ -97,6 +97,7 @@ export default class BookController {
             successResponse(res, 200, result.libro, 'Libro actualizado correctamente')
         } catch(error){
             console.error(`Error al actualizar libro ${error}`)
+            errorResponse(res, 500, 'Error al actualizar libro')
         }
         } else{
             next()
@@ -118,6 +119,7 @@ export default class BookController {
             successResponse(res, 204, null, 'Libro eliminado correctamente')
         } catch (err) {
             console.error(`Error al eliminar libro ${err}`)
+            errorResponse(res, 500, 'Error al eliminar libro')
         }
     }
 
@@ -140,19 +142,22 @@ export default class BookController {
                 return errorResponse(res, 404, result.message);
             }
             
-            successResponse(res, 200, result, 'Solicitud de libro registrada correctamente');
+            successResponse(res, 200, result.data, 'Solicitud de libro registrada correctamente');
         } catch (err) {
-            errorResponse(res, 500, 'Error al procesar la solicitud del libro', err.message);
+            console.error(`Error al procesar la solicitud del libro: ${err}`);
+            errorResponse(res, 500, 'Error al procesar la solicitud del libro');
         }
     }
 
     static getAllSolicitudes = async (req, res) => {
         try {
             const solicitudes = await BookModel.getAllSolicitudes();
+
             successResponse(res, 200, solicitudes, 'Solicitudes obtenidas correctamente');
+
         } catch (err) {
-            // return errorResponse(res, 500, 'Error al obtener las solicitudes', err.message);
             console.error(`Error al obtener las solicitudes ${err}`);
+            errorResponse(res, 500, 'Error al obtener las solicitudes');
         }
     }
 
@@ -172,7 +177,8 @@ export default class BookController {
 
             successResponse(res, 201, null, 'Autor creado exitosamente')
         } catch (error) {
-            console.log(`Error al crear autor ${error}`)
+            console.error(`Error al crear autor ${error}`)
+            errorResponse(res, 500, 'Error al crear autor')
         }
         
     }
@@ -199,7 +205,8 @@ export default class BookController {
 
             successResponse(res, 201, null, 'Editorial creada exitosamente')
         } catch (error) {
-            console.log(`Error al crear editorial ${error}`)
+            console.error(`Error al crear editorial ${error}`)
+            errorResponse(res, 500, 'Error al crear editorial')
         }
         
     }
@@ -232,7 +239,7 @@ export default class BookController {
 
         } catch (error) {
             console.error('Error en updateState:', error);
-            // errorResponse(res, 500, 'Error interno del servidor', error.message)
+            errorResponse(res, 500, 'Error interno del servidor')
         }
     }
 
@@ -292,6 +299,7 @@ export default class BookController {
 
         } catch (error) {
             console.error(`Error al actualizar libro: ${error}`)
+            errorResponse(res, 500, 'Error al actualizar libro')
         }
         
     }
