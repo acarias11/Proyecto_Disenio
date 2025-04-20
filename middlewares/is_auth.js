@@ -8,14 +8,14 @@ export const isAuth = (req, res, next) => {
         
         // Verificar si existe el encabezado de autorización
         if (!authHeader) {
-            errorResponse(res, 401, 'No autorizado: Token no proporcionado');
+            return errorResponse(res, 401, 'No autorizado: Token no proporcionado');
         }
         
         // Extraer el token del encabezado (Bearer [token])
         const token = authHeader.split(' ')[1];
         
         if (!token) {
-            errorResponse(res, 401, 'No autorizado: Formato de token inválido');
+            return errorResponse(res, 401, 'No autorizado: Formato de token inválido');
         }
         
         // Verificar y decodificar el token
@@ -30,9 +30,9 @@ export const isAuth = (req, res, next) => {
         console.error('Error en autenticación:', error.message);
         
         if (error.name === 'TokenExpiredError') {
-            errorResponse(res, 401, 'No autorizado: Token expirado');
+            return errorResponse(res, 401, 'No autorizado: Token expirado');
         }
         
-        errorResponse(res, 401, 'No autorizado: Token inválido');
+        return errorResponse(res, 401, 'No autorizado: Token inválido');
     }
 };

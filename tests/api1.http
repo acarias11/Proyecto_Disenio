@@ -30,7 +30,7 @@ Content-Type: application/json
 ### Verificar usuario
 POST http://localhost:3000/users/verificar
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDEwMTgwLCJleHAiOjE3NDUwMTE5ODB9.2zlyD8KkMGuFlemKA0dlWygVHAZMHeyxTn7tXbfYmBc
+Authorization: Bearer eylhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpoZXJuYW5kZXoxOUBvdXRsb29rLmNvbSIsInJvbCI6IlVzZXIiLCJpYXQiOjE3NDUxNzEwMzUsImV4cCI6MTc0NTE3MjgzNX0.FRtfnCijAfTqXuxmkD4E8iVcrQQh7Dl-qP3AHo1STqY
 
 {
     "id": "4641941C-11C0-415A-9671-A13A4FF36FD2"
@@ -58,7 +58,7 @@ Content-Type: application/json
 ### Registrar un nuevo usuario (con rol admin)
 POST http://localhost:3000/registerAdmin
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTE1MDQxLCJleHAiOjE3NDUxMTY4NDF9.9A2e80c0kGafRiG_N3eLYpACdlg6NT4fH2TR76cYfuw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpoZXJuYW5kZXoxOUBvdXRsb29rLmNvbSIsInJvbCI6IlVzZXIiLCJpYXQiOjE3NDUxNzEwMzUsImV4cCI6MTc0NTE3MjgzNX0.FRtfnCijAfTqXuxmkD4E8iVcrQQh7Dl-qP3AHo1STqY
 
 {
     "nombre": "Alejandro Perez",
@@ -70,4 +70,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Obtener IDs de usuarios (para usar en solicitudes)
 GET http://localhost:3000/users
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTAwMzk5LCJleHAiOjE3NDUxMDIxOTl9.MMMB6YB0NTCa-XCqiQKqNB512v4IeEoTQNxzeTWTChQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTY4NDI4LCJleHAiOjE3NDUxNzAyMjh9.DI4euWb_ciTH0fj0FH--EMm4rkfhHB1viBTiacewkNs

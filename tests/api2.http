@@ -87,7 +87,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Ver historial de eventos (solo admins)
 GET http://localhost:3000/logs
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTE3Mzk0LCJleHAiOjE3NDUxMTkxOTR9.23lwxSoc1mVkMrjhuzJ2wDOojo9001Mri808q81Zm6w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpoZXJuYW5kZXoxOUBvdXRsb29rLmNvbSIsInJvbCI6IlVzZXIiLCJpYXQiOjE3NDUxNzEwMzUsImV4cCI6MTc0NTE3MjgzNX0.FRtfnCijAfTqXuxmkD4E8iVcrQQh7Dl-qP3AHo1STqY
 
 ### Ver historial de eventos de un usuario (solo admins)
 GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A2
