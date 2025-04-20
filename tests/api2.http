@@ -87,11 +87,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 
 ### Ver historial de eventos (solo admins)
 GET http://localhost:3000/logs
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTE3Mzk0LCJleHAiOjE3NDUxMTkxOTR9.23lwxSoc1mVkMrjhuzJ2wDOojo9001Mri808q81Zm6w
 
 ### Ver historial de eventos de un usuario (solo admins)
-GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
+GET http://localhost:3000/logs/065E4E0E-D785-4F6B-88FC-E28FE17D36A2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MTE3Mzk0LCJleHAiOjE3NDUxMTkxOTR9.23lwxSoc1mVkMrjhuzJ2wDOojo9001Mri808q81Zm6w
 
 ### Crear un nuevo autor
 POST http://localhost:3000/libros/author
