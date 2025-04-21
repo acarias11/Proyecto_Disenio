@@ -47,26 +47,33 @@ export default class BookController {
     }
 
     static create = async (req, res) => {
-        const data = req.body
-        const validation = validateBook(data)
+        const data = req.body;
+        const validation = validateBook(data);
         // Obtener el email del usuario desde el token
         const usuarioEmail = req.params.email;
 
         if (!validation.success) {
             return errorResponse(res, 400, 'Datos del libro inválidos', 
                 `${validation.error.errors[0].path}: ${validation.error.errors[0].message}`
-            )
+            );
+        }
+        
+        // Normalizar los géneros para que siempre sean un array
+        if (data.genero && !data.generos) {
+            // Si envían "genero" (singular) lo convertimos a array
+            data.generos = [data.genero];
+        } else if (!data.generos || !Array.isArray(data.generos) || data.generos.length === 0) {
+            return errorResponse(res, 400, 'Debe incluir al menos un género para el libro');
         }
 
         try {
-            const result = await BookModel.createBook(data, usuarioEmail)
+            const result = await BookModel.createBook(data, usuarioEmail);
             successResponse(res, 201, result, 'Libro creado exitosamente');
         } catch (err) {
-            console.error(`Error al crear libro ${err}`)
+            console.error(`Error al crear libro ${err}`);
             errorResponse(res, 500, 'Error al crear libro');
         }
     }
-
 
     static updatePartial = async (req, res, next) => {
 
@@ -94,10 +101,10 @@ export default class BookController {
                 return errorResponse(res, 404, result.message)
             }
 
-            successResponse(res, 200, result.libro, 'Libro actualizado correctamente')
+          return successResponse(res, 200, result.libro, 'Libro actualizado correctamente')
         } catch(error){
             console.error(`Error al actualizar libro ${error}`)
-            errorResponse(res, 500, 'Error al actualizar libro')
+            return errorResponse(res, 500, 'Error al actualizar libro')
         }
         } else{
             next()
@@ -116,10 +123,10 @@ export default class BookController {
                 return errorResponse(res, 404, 'Libro no encontrado')
             }
             
-            successResponse(res, 204, null, 'Libro eliminado correctamente')
+           return successResponse(res, 200, null, 'Libro eliminado correctamente')
         } catch (err) {
             console.error(`Error al eliminar libro ${err}`)
-            errorResponse(res, 500, 'Error al eliminar libro')
+            return errorResponse(res, 500, 'Error al eliminar libro')
         }
     }
 
@@ -142,10 +149,10 @@ export default class BookController {
                 return errorResponse(res, 404, result.message);
             }
             
-            successResponse(res, 200, result.data, 'Solicitud de libro registrada correctamente');
+           return successResponse(res, 200, result.data, 'Solicitud de libro registrada correctamente');
         } catch (err) {
             console.error(`Error al procesar la solicitud del libro: ${err}`);
-            errorResponse(res, 500, 'Error al procesar la solicitud del libro');
+            return errorResponse(res, 500, 'Error al procesar la solicitud del libro');
         }
     }
 

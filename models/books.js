@@ -227,9 +227,7 @@ export async function getBookById(id, usuarioEmail) {
 // Modificar createBook para hacerla más robusta
 export async function createBook(bookData, usuarioEmail) {
     try {
-        
         const pool = await db.connect();
-
         const transaction = new sql.Transaction(db);
         
         await transaction.begin();
@@ -313,7 +311,58 @@ export async function createBook(bookData, usuarioEmail) {
             
             await edicionRequest.query(insertEdicionQuery);
             
-            // 6. Registrar en bitácora (solo si usuarioEmail está disponible y de forma opcional)
+            // 6. NUEVO: Procesar los géneros
+            if (bookData.generos && Array.isArray(bookData.generos) && bookData.generos.length > 0) {
+                console.log("Procesando géneros:", bookData.generos);
+                
+                for (let i = 0; i < bookData.generos.length; i++) {
+                    const genero = bookData.generos[i];
+                    
+                    // Verificar si el género existe
+                    const generoRequest = new sql.Request(transaction);
+                    generoRequest.input('nombreGenero', sql.VarChar(100), genero);
+                    
+                    const checkGenero = await generoRequest.query(`
+                        SELECT GeneroID FROM Genero WHERE Nombre = @nombreGenero
+                    `);
+                    
+                    let generoId;
+                    
+                    // Si no existe, crear el género
+                    if (checkGenero.recordset.length === 0) {
+                        console.log(`Creando nuevo género: ${genero}`);
+                        
+                        const crearGenero = new sql.Request(transaction);
+                        crearGenero.input('nombreGenero', sql.VarChar(100), genero);
+                        
+                        const resultadoCrear = await crearGenero.query(`
+                            INSERT INTO Genero (Nombre)
+                            OUTPUT INSERTED.GeneroID
+                            VALUES (@nombreGenero)
+                        `);
+                        
+                        generoId = resultadoCrear.recordset[0].GeneroID;
+                    } else {
+                        generoId = checkGenero.recordset[0].GeneroID;
+                    }
+                    
+                    // Asociar el género al libro
+                    console.log(`Asociando género ID ${generoId} (${genero}) al libro ${libroId}`);
+                    
+                    const asociarGenero = new sql.Request(transaction);
+                    asociarGenero.input('libroId', sql.UniqueIdentifier, libroId);
+                    asociarGenero.input('generoId', sql.Int, generoId);
+                    
+                    await asociarGenero.query(`
+                        INSERT INTO GeneroLibro (LibroID, GeneroID)
+                        VALUES (@libroId, @generoId)
+                    `);
+                }
+            } else {
+                console.log("No se proporcionaron géneros para el libro");
+            }
+            
+            // 7. Registrar en bitácora
             if (usuarioEmail) {
                 try {
                     console.log("Registrando en bitácora");
@@ -386,9 +435,11 @@ export async function createBook(bookData, usuarioEmail) {
                 await transaction.rollback();
                 console.log("Transacción cancelada (rollback)");
             }
+            throw error; // Propagar el error para manejarlo en el controlador
         }
     } catch (error) {
         console.error('Error al crear libro:', error);
+        return { success: false, message: error.message || 'Error al crear libro' };
     }
 }
 
@@ -838,7 +889,6 @@ export async function updateBookState(solicitudId, estado, usuarioEmail, libroID
             libroInfo = {...solicitudInfo};
             
             // 3. Ejecutar actualización del libro usando el LibroID obtenido de la solicitud
-            // Convertir el GUID a string para evitar problemas con el parámetro
             const solicitudLibroID = solicitudInfo.LibroID;
             
             console.log(`Actualizando libro ID ${solicitudLibroID} a estado ${estado}`);

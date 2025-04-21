@@ -51,13 +51,22 @@ export const bookSchema = z.object({
     }).lte(5, {
         message: "El rating debe ser menor o igual a 5."
     }).optional(),
+    "genero": z.string().optional(),  // Añadir soporte para un solo género
     "generos": z.array(z.string(), {
-        // required_error: "Los géneros son obligatorios."
+        required_error: "Los géneros son obligatorios."
     }).min(1, {
         message: "Debes seleccionar al menos un género."
-    }).optional() // Quitar opcional para que sea obligatorio
+    }).optional() // Dejo este opcional porque se puede enviar genero solo para un solo género o generos para varios
+})
+.superRefine((data, ctx) => {
+    if ((!data.genero && (!data.generos || data.generos.length === 0))) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Debes proporcionar al menos un género (usando 'genero' o 'generos')",
+            path: ['generos']
+        });
+    }
 });
-
 
 // Validar libros de forma completa o parcial
 export const validateBook = (data) => bookSchema.safeParse(data);

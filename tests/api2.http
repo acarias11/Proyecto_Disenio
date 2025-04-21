@@ -3,8 +3,7 @@
 
 ### GET PARA LIBROS
 GET http://localhost:3000/libros
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MjY2MjYxLCJleHAiOjE3NDUyNjgwNjF9.DaqEph1v5rqezyI_3ky4Y5dRbfYOFLp9mhav3xvVpN0
 ### GET PARA LIBROS con filtros
 GET http://localhost:3000/libros?genre=Realismo%mágico&author=Isabel
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
@@ -16,18 +15,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### CREAR UN NUEVO LIBRO (EL AUTOR Y LA EDITORIAL DEBEN EXISTIR EN LA BD)
 POST http://localhost:3000/libros
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MjY1MzgxLCJleHAiOjE3NDUyNjcxODF9.S2vlmBHm3KunKFQAuOJzXEPwgie047mEIPaWC9vVL0E
 
 {
-    "nombre": "Crónica de una muerte anunciada",
+    "nombre": "El coronel no tiene quien le escriba 2",
     "autor": "Gabriel Garcia Marquez",
     "editorial": "Penguin Random House",
     "estado": "Disponible",
     "rating": 4.5,
     "paginas": 120,
     "idioma": "Español",
-    "descripcion": "Novela corta que relata el asesinato de Santiago Nasar a manos de los hermanos Vicario.",
-    "fecha_publicacion": "1981-01-01"
+    "descripcion": "Novela corta que relata la vida de un coronel en un pueblo olvidado.",
+    "fecha_publicacion": "1981-01-01",
+    "genero": "Ficción"
 }
 
 ### Crear otro libro
@@ -57,8 +57,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 }
 
 ### ELIMINAR UN LIBRO 
-DELETE http://localhost:3000/libros/9F433BF7-7A36-46C9-AC75-7AAE8F6BCA57
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
+DELETE http://localhost:3000/libros/CE047B33-36BA-4454-B4A5-33F5707A97B5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MjY1MzgxLCJleHAiOjE3NDUyNjcxODF9.S2vlmBHm3KunKFQAuOJzXEPwgie047mEIPaWC9vVL0E
 
 ### SOLICITAR UN LIBRO (usar un ID de usuario real de la BD) (Esta solicitud se manda a la tabla de solicitudes)
 POST http://localhost:3000/libros/solicitar
