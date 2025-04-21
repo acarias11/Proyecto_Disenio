@@ -962,14 +962,19 @@ export async function updateBookComplete(libro, usuarioEmail){
     for (let i = 0; i < generos.length; i++) {
         
         const genero = generos[i];
-        request2.input(`genero${i}`, sql.NVarChar, genero);
+        
+        const verify = await pool.request().input(`genero${i}`, sql.NVarChar, genero).query(`SELECT GeneroID FROM Genero WHERE Nombre = @genero${i}`);
+        
+        if (verify.recordset.length > 0){
 
-        const insertGeneroQuery = `
+            request2.input(`genero${i}`, sql.NVarChar, genero);
+            
+            const insertGeneroQuery = `
             INSERT INTO GeneroLibro (LibroID, GeneroID)
-            VALUES (@libroId, (SELECT GeneroID FROM Genero WHERE Nombre = @genero${i}))
-        `;
+            VALUES (@libroId, (SELECT GeneroID FROM Genero WHERE Nombre = @genero${i}))`;
 
-        await request2.query(insertGeneroQuery); 
+            await request2.query(insertGeneroQuery);
+        } 
     }
     
     // Registrar en bitácora

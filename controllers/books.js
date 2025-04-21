@@ -23,8 +23,8 @@ export default class BookController {
 
             successResponse(res, 200, result, 'Datos de libros obtenidos correctamente')
         } catch (err){
-            // return errorResponse(res, 500, 'Error al obtener datos de los libros', err.message)
             console.error(`Error al obtener datos de los libros ${err}`)
+            return errorResponse(res, 500, 'Error al obtener datos de los libros')
         }
     }
 

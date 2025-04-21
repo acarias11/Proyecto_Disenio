@@ -118,7 +118,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hc
 ### Actualizar un libro
 PUT http://localhost:3000/libros/E25BD787-39F5-48CB-ACEE-27004E4258C7
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MDk0MzgxLCJleHAiOjE3NDUwOTYxODF9.O2dUp9dvTQjJVuFxPbN2aFDulE_AQnLviYasfeAuPDs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IkFuYU1hcnRpbmV6QGdtYWlsLmNvbSIsInJvbCI6IkFkbWluIiwiaWF0IjoxNzQ1MjY2NTkxLCJleHAiOjE3NDUyNjgzOTF9.c8UuO9BpPTwvibulmBIFtNe6manybbo5-xAFnumRXJQ
 
 {
     "nombre": "Crónica de una muerte anunciada",
